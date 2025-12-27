@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One More - Menú Digital</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+           <img src="img/logo.png" alt="Logo One More" class="logo-img"> 
+            <div class="wavy-line"></div>
+            <div class="tagline">Resto Bar</div>
+            <div class="order-instruction">
+                <span>🍔</span> Pedí por acá 😉
+            </div>
+            <div id="site-hours" class="site-hours" style="margin-top:8px; color:#333; font-weight:600;"></div>
+        </div>
+
+        
+        <!-- Pestañas de navegación -->
+<div class="tabs" id="category-tabs"></div>
+
+<!-- Contenedor de secciones -->
+<div id="menu-container">
+    <!-- HAMBURGUESAS -->
+    <div class="menu-section active" id="hamburguesas">
+        <!-- La promoción se insertará aquí automáticamente los jueves -->
+    </div>
+
+    <!-- PIZZAS -->
+    <div class="menu-section" id="pizzas">
+        <!-- Las pizzas de la base de datos se insertan acá debajo -->
+    </div>
+
+    <!-- SANDWICHES -->
+    <div class="menu-section" id="sandwiches">
+        <!-- Los sandwiches se insertarán aquí automáticamente -->
+    </div>
+</div>
+
+
+        <div class="footer">
+            <p>📍 Leandro N Alem 691, A. Del Valle - Misiones</p>
+            <p>Pedidos únicamente por WhatsApp</p>
+            <div class="social-links">
+                <a href="https://wa.me/5493755415870" target="_blank" class="social-link whatsapp">
+                    <img src="img/what.png" alt="WhatsApp" class="social-icon"> WhatsApp
+                </a>
+                <a href="https://www.instagram.com/onemore.burger/" target="_blank" class="social-link instagram">
+                    <img src="img/ig.png" alt="Instagram" class="social-icon"> Instagram
+                </a>
+            </div>
+            <p class="developer-credit">Desarrollo <a href="https://diegodev-portfolio.netlify.app/" target="_blank">🌐 Diego.Dev</a></p>
+        </div>
+
+    </div>
+
+    <!-- Botón flotante del carrito -->
+    <button class="cart-button" id="cartBtn">
+        🛒
+        <span class="cart-count" id="cartCount">0</span>
+    </button>
+
+    <!-- Modal del carrito -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>Tu Pedido</h2>
+                <button class="close-cart" id="closeCart">×</button>
+            </div>
+
+            <div id="cartItems"></div>
+            <div class="cart-total" id="cartTotal"></div>
+
+            <!-- Selección de entrega -->
+            <div class="delivery-option">
+                <h3>¿Cómo querés recibir tu pedido?</h3>
+                <label>
+                    <input type="radio" name="deliveryType" value="domicilio" id="envioDomicilio">
+                    Envío a domicilio
+                </label>
+                <label>
+                    <input type="radio" name="deliveryType" value="retiro" id="retiroLocal">
+                    Retirar en el local
+                </label>
+
+                <!-- Campo de dirección oculto por defecto -->
+                <div id="direccionContainer" style="display: none; margin-top: 10px;">
+                    <input type="text" id="direccionInput" placeholder="Ingresá tu dirección" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                </div>
+
+                <p class="delivery-note"> El costo de envío varía según tu ubicación.</p>
+            </div>
+
+            <button class="whatsapp-button" id="sendWhatsApp">
+                <span>📱</span> Enviar pedido por WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para selección de mitad y mitad -->
+<div class="half-half-modal" id="halfHalfModal">
+    <div class="cart-content">
+        <div class="cart-header">
+            <h2>🍕 Arma Tu Pizza Mitad & Mitad</h2>
+            <button class="close-cart" onclick="closeHalfHalfModal()">×</button>
+        </div>
+        
+        <div class="half-half-selection">
+            <div class="half-option">
+                <h3>Primera Mitad</h3>
+                <select class="variant" id="firstHalf">
+                    <option value="" disabled selected>Elegí un sabor</option>
+                </select>
+            </div>
+            
+            <div class="half-option">
+                <h3>Segunda Mitad</h3>
+                <select class="variant" id="secondHalf">
+                    <option value="" disabled selected>Elegí un sabor</option>
+                </select>
+            </div>
+            <div class="half-half-total">
+                <div id="halfHalfTotal">Total: $0</div>
+                <div id="halfHalfDescription">Elegí dos sabores diferentes</div>
+            </div>
+            
+            <button class="add-to-order" onclick="addHalfHalfToCart()">+ Agregar al pedido</button>
+        </div>
+    </div>
+</div>
+</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
