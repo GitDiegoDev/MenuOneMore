@@ -284,6 +284,7 @@ async function fetchAndRenderProducts() {
         });
 
         // ====== INSERTAR "PIZZA MITAD & MITAD" SOLO UNA VEZ ======
+        console.log('pizzasSection:', pizzasSection);
         const pizzasSection = document.querySelector('[id^="cat-"][data-pizzas]');
         // ↑ opcional: si no usás data-pizzas, reemplazá por el ID real de la categoría pizzas
 
