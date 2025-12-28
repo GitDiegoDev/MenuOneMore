@@ -282,38 +282,39 @@ async function fetchAndRenderProducts() {
 
             container.appendChild(div);
         });
-
-        // ====== INSERTAR "PIZZA MITAD & MITAD" SOLO UNA VEZ ======
         
-        const pizzasSection = document.querySelector('[id^="cat-"][data-pizzas]');
-        // ↑ opcional: si no usás data-pizzas, reemplazá por el ID real de la categoría pizzas
-        console.log('pizzasSection:', pizzasSection);
+// ====== BUSCAR SECCIÓN PIZZAS ======
+const pizzasSection = document.querySelector('[id^="cat-"]'); // luego lo afinamos
 
-        if (pizzasSection && !pizzasSection.querySelector('[data-item="Pizza Mitad & Mitad"]')) {
-            pizzasSection.insertAdjacentHTML(
-                'afterbegin',
-                `
-                <div class="menu-item halfhalf-item"
-                    data-item="Pizza Mitad & Mitad"
-                    data-price="0"
-                    onclick="openHalfHalfModal()">
+console.log('pizzasSection:', pizzasSection);
 
-                    <div class="new-badge">NUEVO</div>
-                    <div class="click-indicator"></div>
+// ====== INSERTAR "PIZZA MITAD & MITAD" SOLO UNA VEZ ======
+if (pizzasSection && !pizzasSection.querySelector('[data-item="Pizza Mitad & Mitad"]')) {
+    pizzasSection.insertAdjacentHTML(
+        'afterbegin',
+        `
+        <div class="menu-item halfhalf-item"
+            data-item="Pizza Mitad & Mitad"
+            data-price="0"
+            onclick="openHalfHalfModal()">
 
-                    <div class="item-header">
-                        <div class="item-name">🍕 Pizza Mitad & Mitad</div>
-                        <div class="item-price">Elegí sabores</div>
-                    </div>
+            <div class="new-badge">NUEVO</div>
+            <div class="click-indicator"></div>
 
-                    <div class="item-description">
-                        ¡Combiná dos sabores en una sola pizza!<br>
-                        Elegí tus mitades y disfrutá de lo mejor de ambos mundos.
-                    </div>
-                </div>
-                `
-            );
-        }
+            <div class="item-header">
+                <div class="item-name">🍕 Pizza Mitad & Mitad</div>
+                <div class="item-price">Elegí sabores</div>
+            </div>
+
+            <div class="item-description">
+                ¡Combiná dos sabores en una sola pizza!<br>
+                Elegí tus mitades y disfrutá de lo mejor de ambos mundos.
+            </div>
+        </div>
+        `
+    );
+}
+
 
         // Reasignar eventos
         reassignEventListeners();
