@@ -284,7 +284,8 @@ async function fetchAndRenderProducts() {
         });
         
 // ====== BUSCAR SECCIÓN PIZZAS ======
-const pizzasSection = document.querySelector('[id^="cat-"]'); // luego lo afinamos
+const pizzasSection = document.querySelector('[data-category="pizzas"]');
+
 
 console.log('pizzasSection:', pizzasSection);
 
@@ -377,9 +378,14 @@ async function loadMenuCategories() {
             tabsContainer.appendChild(btn);
 
             // ---- SECTION ----
-            const section = document.createElement('div');
+             const section = document.createElement('div');
             section.id = `cat-${cat.id}`;
             section.className = 'menu-section' + (index === 0 ? ' active' : '');
+
+            // 👇 MARCAR PIZZAS
+            if (cat.name.toLowerCase().includes('pizza')) {
+                section.dataset.category = 'pizzas';
+            }
 
             menuContainer.appendChild(section);
         });
@@ -445,7 +451,11 @@ function openHalfHalfModal() {
     halfHalfModal = document.getElementById('halfHalfModal');
 
     // Obtener todas las pizzas disponibles (renderizadas por fetchAndRenderProducts)
-    const pizzaItems = document.querySelectorAll('#pizzas .menu-item');
+    const pizzasSection = document.querySelector('[data-category="pizzas"]');
+    const pizzaItems = pizzasSection
+    ? pizzasSection.querySelectorAll('.menu-item:not(.halfhalf-item)')
+    : [];
+
     const firstHalfSelect = document.getElementById('firstHalf');
     const secondHalfSelect = document.getElementById('secondHalf');
 
