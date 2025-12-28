@@ -585,7 +585,8 @@ function reassignEventListeners() {
         btn.addEventListener('click', function (e) {
             e.stopPropagation();
             const parent = this.closest('.menu-item');
-            const productId = parent.dataset.id;
+            if (!item) return; // ← evita custom items
+            const productId = item.dataset.id;
             const name = parent.dataset.item;
             const price = parseInt(parent.dataset.price) || 0;
             const variantSelect = parent.querySelector('.variant');
