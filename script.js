@@ -581,16 +581,17 @@ function reassignEventListeners() {
 
     // Botones agregar al carrito (incluyendo promos especiales)
     const addButtons = document.querySelectorAll('.add-to-order');
-    addButtons.forEach(btn => {
+        addButtons.forEach(btn => {
         btn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            const parent = this.closest('.menu-item');
-            if (!item) return; // ← evita custom items
-            const productId = item.dataset.id;
-            const name = parent.dataset.item;
-            const price = parseInt(parent.dataset.price) || 0;
-            const variantSelect = parent.querySelector('.variant');
-                let variant = null;
+        e.stopPropagation();
+        const parent = this.closest('.menu-item');
+        if (!parent) return; // si no hay contenedor, salimos
+
+        const productId = parent.dataset.id || null;
+        const name = parent.dataset.item;
+        const price = parseInt(parent.dataset.price) || 0;
+        const variantSelect = parent.querySelector('.variant');
+            let variant = null;
 
                 if (variantSelect) {
                     if (!variantSelect.value) {
