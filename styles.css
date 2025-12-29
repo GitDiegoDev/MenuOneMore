@@ -222,12 +222,33 @@ body {
 .site-hours-sep { margin: 0 6px; color: rgba(0,0,0,0.12); }
 
 @media (max-width: 640px) {
-    .site-hours-pill { font-size: 12px; gap: 8px; padding: 6px 10px; }
-    .site-hours-icon { width: 28px; height: 28px; font-size: 14px; }
-    .site-hours-content { flex-direction: row; align-items: center; gap: 6px; }
-    .site-hours-sep { display: none; }
-    .site-hours-main { gap: 4px; }
+
+    .site-hours-pill {
+        width: 100%;
+        max-width: 100%;
+        justify-content: center;
+        text-align: center;
+        margin: 0 auto;
+        border-radius: 16px; /* más natural en mobile */
+    }
+
+    .site-hours-content {
+        flex-wrap: wrap;
+        white-space: normal;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .site-hours-main {
+        align-items: center;
+        text-align: center;
+    }
+
+    .site-hours-closed-badge {
+        align-self: center;
+    }
 }
+
 
 /* State-specific styles */
 .site-hours-pill.site-hours-open {
