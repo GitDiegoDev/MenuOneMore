@@ -266,11 +266,49 @@ body {
 .site-hours-pill .site-hours-icon { transition: transform 0.15s ease; }
 .site-hours-pill.site-hours-open .site-hours-icon { transform: translateY(-1px); }
 
+.tabs-wrapper {
+    position: relative;
+}
+
+.tabs-hint {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: rgba(255,255,255,0.7);
+    pointer-events: none;
+    animation: slideHint 1.2s infinite;
+}
+
+@keyframes slideHint {
+    0%   { transform: translate(0, -50%); opacity: .4; }
+    50%  { transform: translate(-6px, -50%); opacity: 1; }
+    100% { transform: translate(0, -50%); opacity: .4; }
+}
+
+/* degradado */
+.tabs-wrapper::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 30px;
+    height: 100%;
+    background: linear-gradient(
+    to left,
+    rgba(45, 45, 45, 1),
+    rgba(45, 45, 45, 0)
+);
+    pointer-events: none;
+}
+
 /* Navegación por pestañas */
 .tabs {
     display: flex;
     background: #2d2d2d;
     border-radius: 0;
+    padding-right: 30px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -360,6 +398,68 @@ body {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }
 }
+
+#wa-loading {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.65);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(3px);
+}
+
+.wa-box {
+    background: #ffffff;
+    padding: 26px 30px;
+    border-radius: 16px;
+    text-align: center;
+    width: 260px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    animation: waPop .25s ease-out;
+}
+
+/* Spinner */
+.wa-spinner {
+    width: 46px;
+    height: 46px;
+    border: 4px solid #e0e0e0;
+    border-top-color: #25D366; /* verde WhatsApp */
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    animation: spin 0.9s linear infinite;
+}
+
+.wa-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #222;
+    margin: 0;
+}
+
+.wa-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-top: 6px;
+}
+
+/* Animaciones */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes waPop {
+    from {
+        transform: scale(.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 
 .category-label {
     background: #1a1a1a;

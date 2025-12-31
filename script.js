@@ -7,6 +7,8 @@ function formatPrice(num) {
         maximumFractionDigits: 0
     });
 }
+let initialLoadDone = false;
+
 
 // ========= CONFIG ==========
 const API_BASE = "https://backend-menu-production.up.railway.app/api";
@@ -239,11 +241,20 @@ async function fetchAndRenderProducts() {
 
         const products = await res.json();
 
-        // Limpiar todas las secciones de categorías
-        document.querySelectorAll('.menu-section').forEach(section => {
-            section.innerHTML = '';
-        });
+        // 🚨 Protección: si no hay productos, NO limpiar el menú
 
+        if (!products || products.length === 0) {
+            console.warn('Productos vacíos, se mantiene el menú actual');
+            return;
+        }
+
+        // Limpiar todas las secciones de categorías
+              document.querySelectorAll('.menu-section').forEach(section => {
+         const hasSkeleton = section.querySelector('.menu-skeleton');
+         if (hasSkeleton) {
+             section.innerHTML = '';
+         }
+        });
         products.forEach(p => {
             const container = document.getElementById(`cat-${p.category_id}`);
             if (!container) return;
@@ -711,59 +722,118 @@ if (sendWhatsApp) {
         return;
     }
 
-    /* ================= WHATSAPP ================= */
-    let message = "Hola! quiero hacer este pedido:%0A%0A";
+     /* ================= WHATSAPP ================= */
 
-    cart.forEach(item => {
-        let cleanName = item.name
-            .replace(/&/g, 'y')
-            .replace(/%/g, 'por ciento')
-            .replace(/#/g, 'num');
+let messageLines = [];
+messageLines.push("Hola! Quiero hacer este pedido:");
+messageLines.push("");
 
-        if (cleanName.startsWith("Pizza Mitad y Mitad:")) {
-            const [_, halves] = cleanName.split(":");
-            const [half1, half2] = halves.split("/").map(s => s.trim());
-            message += `• Pizza Mitad y Mitad (mitad ${half1} / mitad ${half2}) - $${item.price}%0A`;
-        } else {
-            message += `• ${cleanName}${item.variant ? ` (${item.variant})` : ''} - $${item.price}%0A`;
-        }
+cart.forEach(item => {
+    let cleanName = item.name
+        .replace(/&/g, 'y')
+        .replace(/%/g, 'por ciento')
+        .replace(/#/g, 'num');
+
+    if (cleanName.startsWith("Pizza Mitad y Mitad:")) {
+        const halves = cleanName.split(":")[1];
+        const [half1, half2] = halves.split("/").map(s => s.trim());
+        messageLines.push(
+            `• Pizza Mitad y Mitad (mitad ${half1} / mitad ${half2}) - $${item.price}`
+        );
+    } else {
+        messageLines.push(
+            `• ${cleanName}${item.variant ? ` (${item.variant})` : ''} - $${item.price}`
+        );
+    }
+});
+
+messageLines.push("");
+messageLines.push(`Total: $${total}`);
+
+if (deliveryType.value === "domicilio") {
+    messageLines.push(`Envío a domicilio`);
+    messageLines.push(`Dirección: ${address}`);
+} else {
+    messageLines.push("Retiro en el local");
+}
+
+const phone = "5493755415870";
+const finalMessage = encodeURIComponent(messageLines.join("\n"));
+
+showWhatsappLoading();
+
+setTimeout(() => {
+window.location.href = `https://wa.me/${phone}?text=${finalMessage}`;
+}, 600);
+
+/* ================= LIMPIAR ================= */
+cart = [];
+updateCart();
+cartModal.classList.remove('active');
     });
 
-    message += `%0ATotal: $${total}%0A`;
-    message += deliveryType.value === "domicilio"
-        ? `%0AEnvío a domicilio • Dirección: ${address}`
-        : `%0ARetiro en el local`;
-
-    const phone = "5493755415870";
-    window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
-
-    /* ================= LIMPIAR ================= */
-    cart = [];
-    updateCart();
-    cartModal.classList.remove('active');
-});
-;
 }
 const REFRESH_INTERVAL_MS = 60000; // 1 minuto
 
+// Mostrar loading de WhatsApp
+
+function showWhatsappLoading() {
+    const loader = document.getElementById('wa-loading');
+    if (!loader) return;
+
+    loader.style.display = 'flex';
+
+    // 🔥 fuerza repintado antes de redirigir
+    loader.offsetHeight;
+}
+
+
+// Mostrar skeleton mientras carga el menú
+function showMenuSkeleton() {
+    document.querySelectorAll('.menu-section').forEach(section => {
+        section.innerHTML = `
+            <div class="menu-skeleton">
+                <div class="skeleton-item"></div>
+                <div class="skeleton-item"></div>
+                <div class="skeleton-item"></div>
+            </div>
+        `;
+    });
+}
+
 // ========= INICIALIZACIÓN AL CARGAR LA PÁGINA =========
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar listeners básicos
+document.addEventListener('DOMContentLoaded', async function () {
     reassignEventListeners();
-    loadMenuCategories();
-    // Cargar datos iniciales
-    fetchAndRenderProducts();
-    fetchAndRenderPromos();
-    fetchAndRenderSiteConfig();
-    
-    
 
-    // Refresco automático
-    setInterval(() => {
-        fetchAndRenderProducts();
-        fetchAndRenderPromos();
+    // 1️⃣ Esperar categorías
+    await loadMenuCategories();
+
+    // 2️⃣ Skeleton SOLO en la carga inicial
+    showMenuSkeleton();
+
+    try {
+        // 3️⃣ Carga inicial
+        await fetchAndRenderProducts();
+        await fetchAndRenderPromos();
         fetchAndRenderSiteConfig();
+        initialLoadDone = true;
+    } catch (e) {
+        console.error('Error en carga inicial del menú', e);
+    }
+
+    // 4️⃣ Refresco automático SEGURO (no rompe el menú)
+    setInterval(async () => {
+        try {
+            await fetchAndRenderProducts();
+            await fetchAndRenderPromos();
+            fetchAndRenderSiteConfig();
+        } catch (e) {
+            console.warn('Error refrescando menú, se mantiene lo ya renderizado');
+        }
     }, REFRESH_INTERVAL_MS);
 });
+
+
+
 
