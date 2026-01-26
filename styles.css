@@ -267,7 +267,10 @@ body {
 .site-hours-pill.site-hours-open .site-hours-icon { transform: translateY(-1px); }
 
 .tabs-wrapper {
-    position: relative;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #1a1a1a;
 }
 
 .tabs-hint {
@@ -287,28 +290,14 @@ body {
     100% { transform: translate(0, -50%); opacity: .4; }
 }
 
-/* degradado */
-.tabs-wrapper::after {
-    content: "";
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 30px;
-    height: 100%;
-    background: linear-gradient(
-    to left,
-    rgba(45, 45, 45, 1),
-    rgba(45, 45, 45, 0)
-);
-    pointer-events: none;
-}
 
 /* Navegación por pestañas */
 .tabs {
     display: flex;
-    background: #2d2d2d;
+    background: #1a1a1a;
     border-radius: 0;
-    padding-right: 30px;
+    padding: 10px;
+    gap: 10px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -319,18 +308,20 @@ body {
 }
 
 .tab {
-    flex: 1;
-    padding: 18px 15px;
+    flex: 0 0 auto;
+    padding: 10px 20px;
     text-align: center;
     background: #2d2d2d;
     color: #999;
     border: none;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     transition: all 0.3s ease;
-    min-width: 120px;
+    min-width: auto;
     position: relative;
+    border-radius: 30px;
+    white-space: nowrap;
 }
 
 .tab:hover {
@@ -339,18 +330,9 @@ body {
 }
 
 .tab.active {
-    background: #f5f2ed;
-    color: #1a1a1a;
-}
-
-.tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: #1a1a1a;
+    background: #ff6b35;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 107, 53, 0.3);
 }
 
 .menu-section {
