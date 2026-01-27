@@ -379,12 +379,22 @@ async function loadMenuCategories() {
         tabsContainer.innerHTML = '';
         menuContainer.innerHTML = '';
 
+        const iconMap = {
+            'hamburguesas': '🍔',
+            'pizzas': '🍕',
+            'sandwiches': '🥪',
+            'al plato': '🍽️'
+        };
+
         categories.forEach((cat, index) => {
             // ---- TAB ----
             const btn = document.createElement('button');
             btn.className = 'tab' + (index === 0 ? ' active' : '');
             btn.dataset.section = `cat-${cat.id}`;
-            btn.textContent = cat.name;
+
+            const categoryNameLower = cat.name.toLowerCase().trim();
+            const icon = iconMap[categoryNameLower] || '🍴';
+            btn.textContent = `${icon} ${cat.name}`;
 
             tabsContainer.appendChild(btn);
 
