@@ -206,33 +206,6 @@ async function fetchAndRenderSiteConfig() {
 
 // ========= SISTEMA PRINCIPAL & RENDER DINÁMICO =========
 
-// Sistema de pestañas
-const tabs = document.querySelectorAll('.tab');
-const sections = document.querySelectorAll('.menu-section');
-
-tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-        const sectionId = tab.dataset.section;
-
-        tabs.forEach(t => t.classList.remove('active'));
-        sections.forEach(s => s.classList.remove('active'));
-
-        tab.classList.add('active');
-        document.getElementById(sectionId).classList.add('active')
-    });
-});
-
-// Util helper para escapar HTML cuando inyectamos texto (previene XSS)
-function escapeHTML(str) {
-    if (!str && str !== 0) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-
 // ---------- Fetch y render de productos (POR CATEGORÍA DINÁMICA) ----------
 async function fetchAndRenderProducts() {
     try {
@@ -248,12 +221,9 @@ async function fetchAndRenderProducts() {
             return;
         }
 
-        // Limpiar todas las secciones de categorías
-              document.querySelectorAll('.menu-section').forEach(section => {
-         const hasSkeleton = section.querySelector('.menu-skeleton');
-         if (hasSkeleton) {
-             section.innerHTML = '';
-         }
+        // Limpiar todas las secciones de categorías antes de renderizar para evitar duplicados
+        document.querySelectorAll('.menu-section').forEach(section => {
+            section.innerHTML = '';
         });
         products.forEach(p => {
             const container = document.getElementById(`cat-${p.category_id}`);
