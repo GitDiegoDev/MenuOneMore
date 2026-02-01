@@ -273,34 +273,16 @@ body {
     background: #1a1a1a;
 }
 
-.tabs-hint {
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 20px;
-    color: rgba(255,255,255,0.7);
-    pointer-events: none;
-    animation: slideHint 1.2s infinite;
-}
-
-@keyframes slideHint {
-    0%   { transform: translate(0, -50%); opacity: .4; }
-    50%  { transform: translate(-6px, -50%); opacity: 1; }
-    100% { transform: translate(0, -50%); opacity: .4; }
-}
 
 
 /* Navegación por pestañas */
 .tabs {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     background: #1a1a1a;
     border-radius: 0;
-    padding: 10px;
-    gap: 10px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    padding: 15px;
+    gap: 12px;
 }
 
 .tabs::-webkit-scrollbar {
@@ -308,20 +290,22 @@ body {
 }
 
 .tab {
-    flex: 0 0 auto;
-    padding: 10px 20px;
+    padding: 15px 10px;
     text-align: center;
     background: #2d2d2d;
     color: #999;
     border: none;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: bold;
     transition: all 0.3s ease;
-    min-width: auto;
     position: relative;
-    border-radius: 30px;
-    white-space: nowrap;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
 }
 
 .tab:hover {
