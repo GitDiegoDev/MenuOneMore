@@ -206,6 +206,16 @@ async function fetchAndRenderSiteConfig() {
 
 // ========= SISTEMA PRINCIPAL & RENDER DINÁMICO =========
 
+// Función para saber si un producto es nuevo (creado en los últimos 30 días)
+function isProductNew(createdAt) {
+    if (!createdAt) return false;
+    const createdDate = new Date(createdAt);
+    const now = new Date();
+    const diffTime = Math.abs(now - createdDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays <= 30;
+}
+
 // ---------- Fetch y render de productos (POR CATEGORÍA DINÁMICA) ----------
 async function fetchAndRenderProducts() {
     try {
@@ -229,7 +239,7 @@ async function fetchAndRenderProducts() {
             const container = document.getElementById(`cat-${p.category_id}`);
             if (!container) return;
 
-            const isNew = p.is_new || p.isNew || false;
+            const isNew = p.is_new || p.isNew || isProductNew(p.created_at);
             const price = p.price ?? 0;
             const hasVariants = p.variants && p.variants.length > 0;
             const imageHtml =
@@ -238,14 +248,15 @@ async function fetchAndRenderProducts() {
                     : '';
 
             const div = document.createElement('div');
-            div.className = 'menu-item';
+            div.className = 'menu-item' + (isNew ? ' new-product-highlight destacado' : '');
             div.dataset.id = p.id;
             div.dataset.item = p.name;
             div.dataset.price = price;
 
             div.innerHTML = `
                 <div class="click-indicator"></div>
-                ${isNew ? '<div class="new-badge">NUEVO</div>' : ''}
+                ${isNew ? '<div class="new-badge">NUEVO ⭐</div>' : ''}
+                ${isNew ? '<div class="savings-badge">¡NUEVO!</div>' : ''}
                 ${imageHtml}
 
                 <div class="item-header">
@@ -275,12 +286,13 @@ if (pizzasSection && !pizzasSection.querySelector('[data-item="Pizza Mitad & Mit
     pizzasSection.insertAdjacentHTML(
         'afterbegin',
         `
-        <div class="menu-item halfhalf-item"
+        <div class="menu-item halfhalf-item new-product-highlight destacado"
             data-item="Pizza Mitad & Mitad"
             data-price="0"
             onclick="openHalfHalfModal()">
 
-            <div class="new-badge">NUEVO</div>
+            <div class="new-badge">NUEVO ⭐</div>
+            <div class="savings-badge">¡NUEVO!</div>
             <div class="click-indicator"></div>
 
             <div class="item-header">

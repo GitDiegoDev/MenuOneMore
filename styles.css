@@ -929,7 +929,7 @@ body {
 }
 
 /* Item de promoción con borde naranja */
-.promo-item {
+.promo-item, .new-product-highlight {
     border: 3px solid #ff6b35 !important;
     position: relative;
 }
