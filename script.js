@@ -152,33 +152,6 @@ async function fetchAndRenderSiteConfig() {
     if (daysText) parts.push(`<span class="site-hours-days">${escapeHTML(daysText)}</span>`);
     // closed will be rendered as a separate small badge so it doesn't push layout
 
-    // Helper: determine if open now
-    function isOpenNow(cfg) {
-        if (!cfg) return false;
-        const now = new Date();
-        const todayIdx = now.getDay();
-        const pad = n => String(n).padStart(2, '0');
-        const todayStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
-
-        if (Array.isArray(cfg.closed_dates) && cfg.closed_dates.includes(todayStr)) return false;
-        if (Array.isArray(cfg.open_days) && !cfg.open_days.includes(todayIdx)) return false;
-
-        if (!cfg.open_time || !cfg.close_time) return false;
-        const [oh, om] = cfg.open_time.split(':').map(Number);
-        const [ch, cm] = cfg.close_time.split(':').map(Number);
-        if (Number.isNaN(oh) || Number.isNaN(om) || Number.isNaN(ch) || Number.isNaN(cm)) return false;
-
-        const nowMinutes = now.getHours() * 60 + now.getMinutes();
-        const openMinutes = oh * 60 + om;
-        const closeMinutes = ch * 60 + cm;
-
-        if (openMinutes <= closeMinutes) {
-            return nowMinutes >= openMinutes && nowMinutes < closeMinutes;
-        }
-        // Overnight range (e.g., 20:00 - 02:00)
-        return nowMinutes >= openMinutes || nowMinutes < closeMinutes;
-    }
-
     const openNow = isOpenNow(config);
     const statusText = openNow ? 'Abierto ahora' : 'Cerrado';
     const pillClass = openNow ? 'site-hours-pill site-hours-open' : 'site-hours-pill site-hours-closed';
@@ -200,6 +173,95 @@ async function fetchAndRenderSiteConfig() {
     `;
 
     target.innerHTML = html;
+
+    // Handle menu blocking based on config
+    handleMenuBlocking(config);
+}
+
+// Helper: determine if today is a non-working day
+function isDayOff(cfg) {
+    if (!cfg) return false;
+    const now = new Date();
+    const todayIdx = now.getDay(); // 0-6
+    const pad = n => String(n).padStart(2, '0');
+    const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+
+    if (Array.isArray(cfg.closed_dates) && cfg.closed_dates.includes(todayStr)) return true;
+    if (Array.isArray(cfg.open_days) && !cfg.open_days.includes(todayIdx)) return true;
+
+    return false;
+}
+
+// Helper: determine if open now (re-defined or moved outside)
+function isOpenNow(cfg) {
+    if (!cfg) return false;
+    const now = new Date();
+    const todayIdx = now.getDay();
+    const pad = n => String(n).padStart(2, '0');
+    const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+
+    if (Array.isArray(cfg.closed_dates) && cfg.closed_dates.includes(todayStr)) return false;
+    if (Array.isArray(cfg.open_days) && !cfg.open_days.includes(todayIdx)) return false;
+
+    if (!cfg.open_time || !cfg.close_time) return false;
+    const [oh, om] = cfg.open_time.split(':').map(Number);
+    const [ch, cm] = cfg.close_time.split(':').map(Number);
+    if (Number.isNaN(oh) || Number.isNaN(om) || Number.isNaN(ch) || Number.isNaN(cm)) return false;
+
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    const openMinutes = oh * 60 + om;
+    const closeMinutes = ch * 60 + cm;
+
+    if (openMinutes <= closeMinutes) {
+        return nowMinutes >= openMinutes && nowMinutes < closeMinutes;
+    }
+    // Overnight range (e.g., 20:00 - 02:00)
+    return nowMinutes >= openMinutes || nowMinutes < closeMinutes;
+}
+
+// Function to handle menu locking and display "day off" message
+function handleMenuBlocking(config) {
+    const container = document.querySelector('.container');
+    const cartBtn = document.getElementById('cartBtn');
+    if (!container || !cartBtn) return;
+
+    // Remove existing banner if any
+    const existingBanner = document.querySelector('.day-off-banner');
+    if (existingBanner) existingBanner.remove();
+
+    if (!config) return;
+
+    const dayOff = isDayOff(config);
+    const openNow = isOpenNow(config);
+
+    if (dayOff) {
+        // Create and insert "day off" banner
+        const banner = document.createElement('div');
+        banner.className = 'day-off-banner';
+        banner.innerHTML = `
+            <div style="font-size: 32px; margin-bottom: 10px;">😴</div>
+            <div>Hoy descansamos, nos encontramos nuevamente mañana</div>
+        `;
+
+        // Insert after header
+        const header = container.querySelector('.header');
+        if (header) {
+            header.insertAdjacentElement('afterend', banner);
+        } else {
+            container.prepend(banner);
+        }
+
+        container.classList.add('menu-locked');
+        cartBtn.classList.add('cart-hidden');
+    } else if (!openNow) {
+        // Just locked because it's outside business hours
+        container.classList.add('menu-locked');
+        cartBtn.classList.add('cart-hidden');
+    } else {
+        // Open and working
+        container.classList.remove('menu-locked');
+        cartBtn.classList.remove('cart-hidden');
+    }
 }
 
 
