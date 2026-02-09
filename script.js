@@ -32,6 +32,43 @@ function escapeHTML(str) {
     }) ?? '';
 }
 
+// ===== SAN VALENTÍN LOGIC =====
+function initValentinesTheme() {
+    const now = new Date();
+    const month = now.getMonth(); // 0-11 (Febrero es 1)
+    const day = now.getDate();
+
+    if (month === 1 && day <= 14) {
+        document.body.classList.add('valentines-theme');
+
+        const header = document.querySelector('.header');
+        if (header && !document.querySelector('.valentine-msg')) {
+            const msg = document.createElement('div');
+            msg.className = 'valentine-msg';
+            msg.innerHTML = '💖 Celebrá el amor en One More 💖';
+            header.appendChild(msg);
+        }
+
+        // Iniciar corazones flotantes
+        setInterval(createFloatingHeart, 3000);
+    }
+}
+
+function createFloatingHeart() {
+    const heart = document.createElement('span');
+    heart.className = 'floating-heart';
+    const hearts = ['❤️', '💖', '💘', '💝', '💕'];
+    heart.innerText = hearts[Math.floor(Math.random() * hearts.length)];
+    heart.style.left = Math.random() * 100 + 'vw';
+    heart.style.animationDuration = (Math.random() * 2 + 3) + 's';
+    document.body.appendChild(heart);
+
+    // Eliminar el elemento después de la animación
+    setTimeout(() => {
+        heart.remove();
+    }, 5000);
+}
+
 // =====================================================================
 // ============= FETCH + RENDER DE PROMOS SIN DUPLICAR =================
 // =====================================================================
@@ -489,7 +526,8 @@ function updateCart() {
     let total = 0;
 
     if (cart.length === 0) {
-        cartItems.innerHTML = '<div class="empty-cart">Tu carrito está vacío</div>';
+        const isValentine = document.body.classList.contains('valentines-theme');
+        cartItems.innerHTML = `<div class="empty-cart">Tu carrito está vacío ${isValentine ? '💘' : ''}</div>`;
         cartTotal.textContent = "";
         return;
     }
@@ -858,6 +896,7 @@ function showMenuSkeleton() {
 // ========= INICIALIZACIÓN AL CARGAR LA PÁGINA =========
 
 document.addEventListener('DOMContentLoaded', async function () {
+    initValentinesTheme();
     reassignEventListeners();
 
     // 1️⃣ Esperar categorías

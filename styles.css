@@ -1083,3 +1083,79 @@ body {
 .cart-hidden {
     display: none !important;
 }
+
+/* ===== SAN VALENTÍN THEME (Temporal hasta 14 Feb) ===== */
+.valentines-theme .order-instruction,
+.valentines-theme .tab.active,
+.valentines-theme .cart-button,
+.valentines-theme .solo-hoy-badge,
+.valentines-theme .add-to-order:hover,
+.valentines-theme .menu-item:hover .item-price {
+    background: #ff4d6d !important;
+    box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3) !important;
+}
+
+.valentines-theme .promo-banner,
+.valentines-theme .promo-button {
+    background: linear-gradient(135deg, #ff4d6d 0%, #ff758c 100%) !important;
+}
+
+.valentines-theme .promo-item,
+.valentines-theme .new-product-highlight,
+.valentines-theme .half-half-promo-item {
+    border-color: #ff4d6d !important;
+}
+
+.valentines-theme .day-off-banner {
+    color: #ff4d6d !important;
+    border-color: #ff4d6d !important;
+}
+
+.valentines-theme .click-indicator {
+    background: #ff4d6d !important;
+}
+
+.valentines-theme .developer-credit a:hover,
+.valentines-theme .footer a:hover {
+    color: #ff4d6d !important;
+}
+
+.valentines-theme .new-badge {
+    background: linear-gradient(45deg, #ff4d6d, #ff758c) !important;
+}
+
+.valentine-msg {
+    margin-top: 15px;
+    font-weight: bold;
+    color: #ff4d6d;
+    font-size: 16px;
+    animation: heartBeat 1.5s infinite;
+}
+
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    14% { transform: scale(1.1); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.1); }
+    70% { transform: scale(1); }
+}
+
+.floating-heart {
+    position: fixed;
+    bottom: -50px;
+    font-size: 24px;
+    z-index: 9999;
+    pointer-events: none;
+    animation: float-heart 5s linear forwards;
+}
+
+@keyframes float-heart {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
