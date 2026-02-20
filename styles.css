@@ -1159,3 +1159,165 @@ body {
         opacity: 0;
     }
 }
+
+/* ===== ESTILOS PARA EL BANNER DE EVENTO ===== */
+.event-banner {
+    background: #1a1a1a;
+    border-radius: 15px;
+    padding: 15px;
+    margin: 15px 0;
+    cursor: pointer;
+    position: relative;
+    border: 1px solid #333;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.event-banner:hover {
+    transform: translateY(-2px);
+    border-color: #ff6b35;
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.2);
+}
+
+.event-banner-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.event-banner-icon {
+    font-size: 30px;
+    background: #2d2d2d;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.event-banner-text {
+    flex: 1;
+}
+
+.event-banner-tag {
+    background: #ff6b35;
+    color: white;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+.event-banner-title {
+    color: #fff;
+    font-size: 16px;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.event-banner-subtitle {
+    color: #999;
+    font-size: 13px;
+    margin: 3px 0 0;
+}
+
+.event-banner-action {
+    background: transparent;
+    color: #ff6b35;
+    border: 1px solid #ff6b35;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.close-banner {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 10;
+}
+
+.close-banner:hover {
+    color: #fff;
+}
+
+/* Modal de Evento */
+.event-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 4000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(5px);
+}
+
+.event-modal.active {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+.event-modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90vh;
+}
+
+.event-poster-img {
+    max-width: 100%;
+    max-height: 85vh;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    display: block;
+}
+
+.close-event-modal {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 35px;
+    cursor: pointer;
+}
+
+@media (max-width: 480px) {
+    .event-banner-content {
+        gap: 10px;
+    }
+    .event-banner-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+    .event-banner-title {
+        font-size: 14px;
+    }
+    .event-banner-subtitle {
+        font-size: 11px;
+    }
+    .event-banner-action {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+}

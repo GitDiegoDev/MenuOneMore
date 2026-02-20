@@ -930,3 +930,36 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 
 
+
+// ========== EVENT BANNER & MODAL LOGIC ==========
+
+function openEventModal() {
+    const modal = document.getElementById('eventModal');
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeEventModal() {
+    const modal = document.getElementById('eventModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+function closeEventBanner() {
+    const banner = document.getElementById('eventBanner');
+    if (banner) {
+        banner.style.display = 'none';
+    }
+}
+
+// Cerrar modal al hacer clic fuera del contenido
+window.addEventListener('click', (e) => {
+    const modal = document.getElementById('eventModal');
+    if (e.target === modal) {
+        closeEventModal();
+    }
+});

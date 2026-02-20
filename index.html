@@ -18,6 +18,20 @@
             <div id="site-hours" class="site-hours" style="margin-top:8px; color:#333; font-weight:600;"></div>
         </div>
 
+        <!-- Banner de Evento -->
+        <div class="event-banner" id="eventBanner" onclick="openEventModal()">
+            <button class="close-banner" id="closeBannerBtn" onclick="event.stopPropagation(); closeEventBanner()">&times;</button>
+            <div class="event-banner-content">
+                <div class="event-banner-icon">🎸</div>
+                <div class="event-banner-text">
+                    <span class="event-banner-tag">PRÓXIMO SÁBADO</span>
+                    <h3 class="event-banner-title">Alex Balbuena & Matias Vázquez</h3>
+                    <p class="event-banner-subtitle">Música en vivo • 20:00hs</p>
+                </div>
+                <div class="event-banner-action">Ver póster</div>
+            </div>
+        </div>
+
         
         <!-- Pestañas de navegación -->
 
@@ -142,6 +156,14 @@
         <div class="wa-spinner"></div>
         <p class="wa-title">Enviando pedido</p>
         <p class="wa-subtitle">Abriendo WhatsApp…</p>
+    </div>
+</div>
+
+<!-- Modal de Evento -->
+<div class="event-modal" id="eventModal">
+    <div class="event-modal-content">
+        <button class="close-event-modal" id="closeEventModalBtn" onclick="closeEventModal()">&times;</button>
+        <img src="img/event-banner.png" alt="Evento Poster" class="event-poster-img">
     </div>
 </div>
 
