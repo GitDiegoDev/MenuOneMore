@@ -86,6 +86,13 @@ async function fetchAndRenderPromos() {
         document.querySelectorAll(".promo-banner").forEach(el => el.remove());
         document.querySelectorAll(".solo-hoy-badge").forEach(el => el.remove());
 
+        // Control de visibilidad del banner de evento (Alex Balbuena)
+        // Se elimina automáticamente después del 21 de Febrero 2026
+        const eventDate = new Date(2026, 1, 21, 23, 59, 59);
+        if (new Date() > eventDate) {
+            document.getElementById('eventBanner')?.remove();
+        }
+
         const hoy = new Date().getDay(); // 0-6
 
         // Filtrar promos activas del día
