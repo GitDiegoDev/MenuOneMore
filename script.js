@@ -32,42 +32,6 @@ function escapeHTML(str) {
     }) ?? '';
 }
 
-// ===== SAN VALENTÍN LOGIC =====
-function initValentinesTheme() {
-    const now = new Date();
-    const month = now.getMonth(); // 0-11 (Febrero es 1)
-    const day = now.getDate();
-
-    if (month === 1 && day <= 14) {
-        document.body.classList.add('valentines-theme');
-
-        const header = document.querySelector('.header');
-        if (header && !document.querySelector('.valentine-msg')) {
-            const msg = document.createElement('div');
-            msg.className = 'valentine-msg';
-            msg.innerHTML = '💖 Celebrá el amor en One More 💖';
-            header.appendChild(msg);
-        }
-
-        // Iniciar corazones flotantes
-        setInterval(createFloatingHeart, 3000);
-    }
-}
-
-function createFloatingHeart() {
-    const heart = document.createElement('span');
-    heart.className = 'floating-heart';
-    const hearts = ['❤️', '💖', '💘', '💝', '💕'];
-    heart.innerText = hearts[Math.floor(Math.random() * hearts.length)];
-    heart.style.left = Math.random() * 100 + 'vw';
-    heart.style.animationDuration = (Math.random() * 2 + 3) + 's';
-    document.body.appendChild(heart);
-
-    // Eliminar el elemento después de la animación
-    setTimeout(() => {
-        heart.remove();
-    }, 5000);
-}
 
 // =====================================================================
 // ============= FETCH + RENDER DE PROMOS SIN DUPLICAR =================
@@ -86,12 +50,6 @@ async function fetchAndRenderPromos() {
         document.querySelectorAll(".promo-banner").forEach(el => el.remove());
         document.querySelectorAll(".solo-hoy-badge").forEach(el => el.remove());
 
-        // Control de visibilidad del banner de evento (Alex Balbuena)
-        // Se elimina automáticamente después del 21 de Febrero 2026
-        const eventDate = new Date(2026, 1, 21, 23, 59, 59);
-        if (new Date() > eventDate) {
-            document.getElementById('eventBanner')?.remove();
-        }
 
         const hoy = new Date().getDay(); // 0-6
 
@@ -533,8 +491,7 @@ function updateCart() {
     let total = 0;
 
     if (cart.length === 0) {
-        const isValentine = document.body.classList.contains('valentines-theme');
-        cartItems.innerHTML = `<div class="empty-cart">Tu carrito está vacío ${isValentine ? '💘' : ''}</div>`;
+        cartItems.innerHTML = `<div class="empty-cart">Tu carrito está vacío</div>`;
         cartTotal.textContent = "";
         return;
     }
@@ -903,7 +860,6 @@ function showMenuSkeleton() {
 // ========= INICIALIZACIÓN AL CARGAR LA PÁGINA =========
 
 document.addEventListener('DOMContentLoaded', async function () {
-    initValentinesTheme();
     reassignEventListeners();
 
     // 1️⃣ Esperar categorías
@@ -938,35 +894,3 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 
 
-// ========== EVENT BANNER & MODAL LOGIC ==========
-
-function openEventModal() {
-    const modal = document.getElementById('eventModal');
-    if (modal) {
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-}
-
-function closeEventModal() {
-    const modal = document.getElementById('eventModal');
-    if (modal) {
-        modal.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-}
-
-function closeEventBanner() {
-    const banner = document.getElementById('eventBanner');
-    if (banner) {
-        banner.style.display = 'none';
-    }
-}
-
-// Cerrar modal al hacer clic fuera del contenido
-window.addEventListener('click', (e) => {
-    const modal = document.getElementById('eventModal');
-    if (e.target === modal) {
-        closeEventModal();
-    }
-});
