@@ -1087,8 +1087,9 @@ body {
 
 /* Advertising Banner */
 .promo-advertising-banner {
-    width: 100%;
-    margin-bottom: 20px;
+    width: 70%;
+    max-width: 400px;
+    margin: 0 auto 20px auto;
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
