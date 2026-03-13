@@ -481,11 +481,60 @@ async function loadMenuCategories() {
 
 let cart = [];
 
+function showToast(message) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `<span>🛒</span> ${message}`;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 3500);
+}
+
+function addToCart(newItem) {
+    const existingItem = cart.find(item =>
+        item.product_id === newItem.product_id &&
+        item.name === newItem.name &&
+        item.variant === newItem.variant
+    );
+
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({ ...newItem, quantity: 1 });
+    }
+    updateCart();
+    showToast(`${newItem.name} agregado`);
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCart();
+}
+
+function changeQuantity(index, delta) {
+    if (cart[index]) {
+        cart[index].quantity += delta;
+        if (cart[index].quantity <= 0) {
+            removeFromCart(index);
+        } else {
+            updateCart();
+        }
+    }
+}
+
 function updateCart() {
     const cartCount = document.getElementById('cartCount');
     const cartItems = document.getElementById('cartItems');
     const cartTotal = document.getElementById('cartTotal');
-    cartCount.textContent = cart.length;
+
+    const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+    cartCount.textContent = totalQuantity;
 
     cartItems.innerHTML = "";
     let total = 0;
@@ -496,18 +545,35 @@ function updateCart() {
         return;
     }
 
-    cart.forEach((item) => {
+    cart.forEach((item, index) => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+
         const div = document.createElement('div');
         div.classList.add('cart-item');
         div.innerHTML = `
-            <div>${escapeHTML(item.name)} ${item.variant ? `(${escapeHTML(item.variant)})` : ''}</div>
-            <div>$${item.price}</div>
+            <div class="cart-item-info">
+                <div class="cart-item-name">
+                    ${escapeHTML(item.name)}
+                    ${item.variant ? `<br><small class="cart-item-variant">${escapeHTML(item.variant)}</small>` : ''}
+                </div>
+                <div class="cart-item-price">$${formatPrice(itemTotal)}</div>
+            </div>
+            <div class="cart-item-actions">
+                <div class="quantity-controls">
+                    <button class="qty-btn" onclick="changeQuantity(${index}, -1)">-</button>
+                    <span class="qty-val">${item.quantity}</span>
+                    <button class="qty-btn" onclick="changeQuantity(${index}, 1)">+</button>
+                </div>
+                <button class="remove-btn" onclick="removeFromCart(${index})" aria-label="Eliminar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                </button>
+            </div>
         `;
         cartItems.appendChild(div);
-        total += Number(item.price);
     });
 
-    cartTotal.textContent = "Total: $" + total;
+    cartTotal.textContent = "Total: $" + formatPrice(total);
 }
 
 // ========== SISTEMA MITAD & MITAD ==========
@@ -603,16 +669,13 @@ function addHalfHalfToCart() {
     const finalPrice = Math.max(p1, p2);
     const itemName = `Pizza Mitad y Mitad: ${name1} / ${name2}`;
 
-    cart.push({
-    product_id: null,
-    name: itemName,
-    price: finalPrice,
-    quantity: 1,
-    variant: null,
-    is_custom: true
-});
-
-    updateCart();
+    addToCart({
+        product_id: null,
+        name: itemName,
+        price: finalPrice,
+        variant: null,
+        is_custom: true
+    });
     closeHalfHalfModal();
 
     const halfItem = document.querySelector('[data-item="Pizza Mitad & Mitad"]');
@@ -680,14 +743,12 @@ function reassignEventListeners() {
             }
 
             // Agregar al carrito
-            cart.push({
-            product_id: parent.dataset.id ? Number(parent.dataset.id) : null,
-            name,
-            price,        // mismo precio del producto
-            quantity: 1,
-            variant       // solo texto
+            addToCart({
+                product_id: parent.dataset.id ? Number(parent.dataset.id) : null,
+                name,
+                price,        // mismo precio del producto
+                variant       // solo texto
             });
-            updateCart();
             parent.classList.add('pulse');
             setTimeout(() => parent.classList.remove('pulse'), 500);
 
@@ -753,7 +814,7 @@ if (sendWhatsApp) {
         }
     }
 
-    const total = cart.reduce((acc, i) => acc + i.price, 0);
+    const total = cart.reduce((acc, i) => acc + (i.price * i.quantity), 0);
 
     /* ================= GUARDAR PEDIDO ================= */
     try {
@@ -790,15 +851,18 @@ cart.forEach(item => {
         .replace(/%/g, 'por ciento')
         .replace(/#/g, 'num');
 
+    const qtyPrefix = item.quantity > 1 ? `${item.quantity}x ` : '';
+    const itemTotal = item.price * item.quantity;
+
     if (cleanName.startsWith("Pizza Mitad y Mitad:")) {
         const halves = cleanName.split(":")[1];
         const [half1, half2] = halves.split("/").map(s => s.trim());
         messageLines.push(
-            `• Pizza Mitad y Mitad (mitad ${half1} / mitad ${half2}) - $${item.price}`
+            `• ${qtyPrefix}Pizza Mitad y Mitad (mitad ${half1} / mitad ${half2}) - $${formatPrice(itemTotal)}`
         );
     } else {
         messageLines.push(
-            `• ${cleanName}${item.variant ? ` (${item.variant})` : ''} - $${item.price}`
+            `• ${qtyPrefix}${cleanName}${item.variant ? ` (${item.variant})` : ''} - $${formatPrice(itemTotal)}`
         );
     }
 });
@@ -857,10 +921,61 @@ function showMenuSkeleton() {
     });
 }
 
+// ========= BUSCADOR =========
+
+function initSearch() {
+    const searchInput = document.getElementById('productSearch');
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase().trim();
+        const menuItems = document.querySelectorAll('.menu-item:not(.halfhalf-item)');
+        const sections = document.querySelectorAll('.menu-section');
+        const tabsWrapper = document.querySelector('.tabs-wrapper');
+
+        if (term === "") {
+            // Restaurar vista original
+            menuItems.forEach(item => item.style.display = 'flex');
+            sections.forEach(section => {
+                section.style.display = ''; // Reset to class-based display
+            });
+            if (tabsWrapper) tabsWrapper.style.display = 'flex';
+            return;
+        }
+
+        // Ocultar tabs durante la búsqueda para mejor UX
+        if (tabsWrapper) tabsWrapper.style.display = 'none';
+
+        sections.forEach(section => {
+            let hasVisibleItems = false;
+            const items = section.querySelectorAll('.menu-item:not(.halfhalf-item)');
+
+            items.forEach(item => {
+                const name = item.dataset.item.toLowerCase();
+                const desc = item.querySelector('.item-description')?.textContent.toLowerCase() || "";
+
+                if (name.includes(term) || desc.includes(term)) {
+                    item.style.display = 'flex';
+                    hasVisibleItems = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Mostrar sección solo si tiene items visibles
+            section.style.display = hasVisibleItems ? 'block' : 'none';
+            if (hasVisibleItems) {
+                section.classList.add('active');
+            }
+        });
+    });
+}
+
 // ========= INICIALIZACIÓN AL CARGAR LA PÁGINA =========
 
 document.addEventListener('DOMContentLoaded', async function () {
     reassignEventListeners();
+    initSearch();
 
     // 1️⃣ Esperar categorías
     await loadMenuCategories();

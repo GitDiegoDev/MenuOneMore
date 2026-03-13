@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>One More - Menú Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -18,7 +21,13 @@
             <div id="site-hours" class="site-hours" style="margin-top:8px; color:#333; font-weight:600;"></div>
         </div>
 
-
+        <!-- Buscador -->
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="productSearch" placeholder="¿Qué tenés ganas de comer?">
+            </div>
+        </div>
         
         <!-- Pestañas de navegación -->
 
@@ -70,12 +79,11 @@
 
     <!-- Modal del carrito -->
     <div class="cart-modal" id="cartModal">
+        <div class="cart-header">
+            <h2>Tu Pedido</h2>
+            <button class="close-cart" id="closeCart">×</button>
+        </div>
         <div class="cart-content">
-            <div class="cart-header">
-                <h2>Tu Pedido</h2>
-                <button class="close-cart" id="closeCart">×</button>
-            </div>
-
             <div id="cartItems"></div>
             <div class="cart-total" id="cartTotal"></div>
 
@@ -149,6 +157,7 @@
 
 
 
+    <div id="toast-container" class="toast-container"></div>
     <script src="script.js"></script>
 </body>
 </html>
