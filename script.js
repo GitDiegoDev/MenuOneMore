@@ -799,6 +799,12 @@ if (sendWhatsApp) {
         return;
     }
 
+    const nombre = document.getElementById('clienteNombre').value.trim();
+    if (!nombre) {
+        alert("Por favor ingresá tu nombre");
+        return;
+    }
+
     const deliveryType = document.querySelector('input[name="deliveryType"]:checked');
     if (!deliveryType) {
         alert("Por favor seleccioná si querés envío o retiro");
@@ -814,6 +820,12 @@ if (sendWhatsApp) {
         }
     }
 
+    const metodoPago = document.getElementById('metodoPago').value;
+    if (!metodoPago) {
+        alert("Por favor seleccioná un método de pago");
+        return;
+    }
+
     const total = cart.reduce((acc, i) => acc + (i.price * i.quantity), 0);
 
     /* ================= GUARDAR PEDIDO ================= */
@@ -825,7 +837,9 @@ if (sendWhatsApp) {
                 items: cart,
                 total,
                 delivery_type: deliveryType.value,
-                address
+                address,
+                customer_name: nombre,
+                payment_method: metodoPago
             })
         });
 
@@ -843,6 +857,8 @@ if (sendWhatsApp) {
 
 let messageLines = [];
 messageLines.push("Hola! Quiero hacer este pedido:");
+messageLines.push("");
+messageLines.push(`*Cliente:* ${nombre}`);
 messageLines.push("");
 
 cart.forEach(item => {
@@ -868,14 +884,17 @@ cart.forEach(item => {
 });
 
 messageLines.push("");
-messageLines.push(`Total: $${total}`);
+messageLines.push(`*Total: $${formatPrice(total)}*`);
+messageLines.push("");
 
 if (deliveryType.value === "domicilio") {
-    messageLines.push(`Envío a domicilio`);
-    messageLines.push(`Dirección: ${address}`);
+    messageLines.push(`*Tipo:* Envío a domicilio`);
+    messageLines.push(`*Dirección:* ${address}`);
 } else {
-    messageLines.push("Retiro en el local");
+    messageLines.push("*Tipo:* Retiro en el local");
 }
+
+messageLines.push(`*Pago:* ${metodoPago}`);
 
 const phone = "5493755415870";
 const finalMessage = encodeURIComponent(messageLines.join("\n"));
@@ -921,61 +940,10 @@ function showMenuSkeleton() {
     });
 }
 
-// ========= BUSCADOR =========
-
-function initSearch() {
-    const searchInput = document.getElementById('productSearch');
-    if (!searchInput) return;
-
-    searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase().trim();
-        const menuItems = document.querySelectorAll('.menu-item:not(.halfhalf-item)');
-        const sections = document.querySelectorAll('.menu-section');
-        const tabsWrapper = document.querySelector('.tabs-wrapper');
-
-        if (term === "") {
-            // Restaurar vista original
-            menuItems.forEach(item => item.style.display = 'flex');
-            sections.forEach(section => {
-                section.style.display = ''; // Reset to class-based display
-            });
-            if (tabsWrapper) tabsWrapper.style.display = 'flex';
-            return;
-        }
-
-        // Ocultar tabs durante la búsqueda para mejor UX
-        if (tabsWrapper) tabsWrapper.style.display = 'none';
-
-        sections.forEach(section => {
-            let hasVisibleItems = false;
-            const items = section.querySelectorAll('.menu-item:not(.halfhalf-item)');
-
-            items.forEach(item => {
-                const name = item.dataset.item.toLowerCase();
-                const desc = item.querySelector('.item-description')?.textContent.toLowerCase() || "";
-
-                if (name.includes(term) || desc.includes(term)) {
-                    item.style.display = 'flex';
-                    hasVisibleItems = true;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-
-            // Mostrar sección solo si tiene items visibles
-            section.style.display = hasVisibleItems ? 'block' : 'none';
-            if (hasVisibleItems) {
-                section.classList.add('active');
-            }
-        });
-    });
-}
-
 // ========= INICIALIZACIÓN AL CARGAR LA PÁGINA =========
 
 document.addEventListener('DOMContentLoaded', async function () {
     reassignEventListeners();
-    initSearch();
 
     // 1️⃣ Esperar categorías
     await loadMenuCategories();

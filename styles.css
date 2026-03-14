@@ -22,7 +22,7 @@
 }
 
 body {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, var(--dark) 0%, var(--dark-accent) 100%);
     color: #333;
     min-height: 100vh;
@@ -43,22 +43,6 @@ body {
     box-shadow: 0 5px 20px rgba(0,0,0,0.2);
     position: relative;
     overflow: hidden;
-}
-
-.header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-    animation: shine 3s infinite;
-}
-
-@keyframes shine {
-    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
 }
 
 .logo {
@@ -169,47 +153,6 @@ body {
     font-style: italic;
 }
 
-/* Search bar styling */
-.search-container {
-    padding: 10px 20px;
-    background: var(--dark);
-}
-
-.search-box {
-    display: flex;
-    align-items: center;
-    background: var(--dark-accent);
-    padding: 12px 18px;
-    border-radius: 30px;
-    border: 1px solid rgba(255,255,255,0.05);
-    transition: all 0.3s ease;
-}
-
-.search-box:focus-within {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
-}
-
-.search-icon {
-    margin-right: 12px;
-    font-size: 16px;
-    opacity: 0.7;
-}
-
-#productSearch {
-    background: transparent;
-    border: none;
-    color: var(--white);
-    font-family: inherit;
-    font-size: 14px;
-    width: 100%;
-    outline: none;
-}
-
-#productSearch::placeholder {
-    color: var(--gray-light);
-    opacity: 0.6;
-}
 
 /* Site hours display (discrete, pill) */
 #site-hours {
@@ -336,16 +279,11 @@ body {
 /* Navegación por pestañas - Horizontal Scroll */
 .tabs {
     display: flex;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
+    flex-wrap: wrap;
+    justify-content: center;
     background: var(--dark);
     padding: 15px 10px;
-    gap: 12px;
-}
-
-.tabs::-webkit-scrollbar {
-    display: none;
+    gap: 10px;
 }
 
 .tab {
@@ -382,48 +320,20 @@ body {
 
 .menu-section {
     background: #f5f2ed;
-    padding: 40px 25px;
+    padding: 30px 15px;
     display: none;
-    animation: fadeIn 0.4s ease;
 }
 
 .menu-section.active {
     display: block;
 }
 
-.menu-section:last-of-type.active {
-    border-radius: 0 0 20px 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.section-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 30px;
-    gap: 15px;
-}
-
 .section-title {
-    font-size: 32px;
+    font-size: 24px;
     font-weight: bold;
     text-transform: uppercase;
-    letter-spacing: 3px;
-}
-
-.section-icon {
-    font-size: 50px;
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+    margin-bottom: 20px;
+    text-align: center;
 }
 
 #wa-loading {
@@ -501,51 +411,17 @@ body {
 }
 
 .menu-item {
-    margin-bottom: 25px;
-    padding: 20px;
+    margin-bottom: 15px;
+    padding: 15px;
     background: var(--white);
     border-radius: var(--border-radius);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid #eee;
     position: relative;
-    box-shadow: var(--shadow-soft);
-    animation: fadeInUp 0.5s ease backwards;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.menu-item:nth-child(1) { animation-delay: 0.1s; }
-.menu-item:nth-child(2) { animation-delay: 0.15s; }
-.menu-item:nth-child(3) { animation-delay: 0.2s; }
-.menu-item:nth-child(4) { animation-delay: 0.25s; }
-.menu-item:nth-child(5) { animation-delay: 0.3s; }
-.menu-item:nth-child(6) { animation-delay: 0.35s; }
-.menu-item:nth-child(7) { animation-delay: 0.4s; }
-.menu-item:nth-child(8) { animation-delay: 0.45s; }
-.menu-item:nth-child(9) { animation-delay: 0.5s; }
-.menu-item:nth-child(10) { animation-delay: 0.55s; }
-.menu-item:nth-child(n+11) { animation-delay: 0.6s; }
-
-.menu-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    border-color: var(--primary);
 }
 
 .menu-item.expanded {
-    background: var(--white);
     border-color: var(--primary);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 /* === MITAD & MITAD DISEÑO ESPECIAL === */
 
@@ -1083,26 +959,13 @@ body {
 
 /* Banner destacado para la sección de promos */
 .promo-banner {
-    background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+    background: var(--primary);
     color: white;
     padding: 20px;
     border-radius: 15px;
     text-align: center;
     margin-bottom: 25px;
     position: relative;
-    overflow: hidden;
-    box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
-}
-
-.promo-banner::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-    animation: shine 3s infinite;
 }
 
 .promo-banner h2 {
