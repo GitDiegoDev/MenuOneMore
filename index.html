@@ -18,8 +18,6 @@
             <div id="site-hours" class="site-hours" style="margin-top:8px; color:#333; font-weight:600;"></div>
         </div>
 
-
-        
         <!-- Pestañas de navegación -->
 
         <div class="tabs-wrapper">
@@ -70,17 +68,21 @@
 
     <!-- Modal del carrito -->
     <div class="cart-modal" id="cartModal">
+        <div class="cart-header">
+            <h2>Tu Pedido</h2>
+            <button class="close-cart" id="closeCart">×</button>
+        </div>
         <div class="cart-content">
-            <div class="cart-header">
-                <h2>Tu Pedido</h2>
-                <button class="close-cart" id="closeCart">×</button>
-            </div>
-
             <div id="cartItems"></div>
             <div class="cart-total" id="cartTotal"></div>
 
-            <!-- Selección de entrega -->
+            <!-- Datos del cliente -->
             <div class="delivery-option">
+                <h3>Tus Datos</h3>
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <input type="text" id="clienteNombre" placeholder="Tu Nombre y Apellido" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit;">
+                </div>
+
                 <h3>¿Cómo querés recibir tu pedido?</h3>
                 <label>
                     <input type="radio" name="deliveryType" value="domicilio" id="envioDomicilio">
@@ -92,9 +94,16 @@
                 </label>
 
                 <!-- Campo de dirección oculto por defecto -->
-                <div id="direccionContainer" style="display: none; margin-top: 10px;">
-                    <input type="text" id="direccionInput" placeholder="Ingresá tu dirección" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                <div id="direccionContainer" style="display: none; margin-top: 10px; margin-bottom: 15px;">
+                    <input type="text" id="direccionInput" placeholder="Ingresá tu dirección" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit;">
                 </div>
+
+                <h3>Método de Pago</h3>
+                <select id="metodoPago" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; margin-bottom: 10px; background: white;">
+                    <option value="" disabled selected>Elegí cómo pagar</option>
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Transferencia">Transferencia</option>
+                </select>
 
                 <p class="delivery-note"> El costo de envío varía según tu ubicación.</p>
             </div>
@@ -149,6 +158,7 @@
 
 
 
+    <div id="toast-container" class="toast-container"></div>
     <script src="script.js"></script>
 </body>
 </html>
