@@ -485,7 +485,10 @@ function updateCart() {
     const cartCount = document.getElementById('cartCount');
     const cartItems = document.getElementById('cartItems');
     const cartTotal = document.getElementById('cartTotal');
-    cartCount.textContent = cart.length;
+
+    // Contar total de unidades
+    const totalQty = cart.reduce((acc, item) => acc + item.quantity, 0);
+    cartCount.textContent = totalQty;
 
     cartItems.innerHTML = "";
     let total = 0;
@@ -496,18 +499,46 @@ function updateCart() {
         return;
     }
 
-    cart.forEach((item) => {
+    cart.forEach((item, index) => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+
         const div = document.createElement('div');
         div.classList.add('cart-item');
         div.innerHTML = `
-            <div>${escapeHTML(item.name)} ${item.variant ? `(${escapeHTML(item.variant)})` : ''}</div>
-            <div>$${item.price}</div>
+            <div class="cart-item-info">
+                <div class="cart-item-name">${escapeHTML(item.name)}</div>
+                ${item.variant ? `<div class="cart-item-variant">${escapeHTML(item.variant)}</div>` : ''}
+                <div class="cart-item-price">$${formatPrice(itemTotal)}</div>
+            </div>
+            <div class="cart-item-controls">
+                <button class="qty-btn" onclick="changeQuantity(${index}, -1)">-</button>
+                <span class="cart-qty">${item.quantity}</span>
+                <button class="qty-btn" onclick="changeQuantity(${index}, 1)">+</button>
+                <button class="remove-btn" onclick="removeFromCart(${index})">🗑️</button>
+            </div>
         `;
         cartItems.appendChild(div);
-        total += Number(item.price);
     });
 
-    cartTotal.textContent = "Total: $" + total;
+    cartTotal.textContent = "Total: $" + formatPrice(total);
+}
+
+function changeQuantity(index, delta) {
+    if (cart[index]) {
+        cart[index].quantity += delta;
+        if (cart[index].quantity <= 0) {
+            cart.splice(index, 1);
+        }
+        updateCart();
+    }
+}
+
+function removeFromCart(index) {
+    if (cart[index]) {
+        cart.splice(index, 1);
+        updateCart();
+    }
 }
 
 // ========== SISTEMA MITAD & MITAD ==========
@@ -603,14 +634,19 @@ function addHalfHalfToCart() {
     const finalPrice = Math.max(p1, p2);
     const itemName = `Pizza Mitad y Mitad: ${name1} / ${name2}`;
 
-    cart.push({
-    product_id: null,
-    name: itemName,
-    price: finalPrice,
-    quantity: 1,
-    variant: null,
-    is_custom: true
-});
+    const existingItem = cart.find(item => item.name === itemName);
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({
+            product_id: null,
+            name: itemName,
+            price: finalPrice,
+            quantity: 1,
+            variant: null,
+            is_custom: true
+        });
+    }
 
     updateCart();
     closeHalfHalfModal();
@@ -679,14 +715,24 @@ function reassignEventListeners() {
                 // Si es otra promo - agregar como item normal
             }
 
-            // Agregar al carrito
-            cart.push({
-            product_id: parent.dataset.id ? Number(parent.dataset.id) : null,
-            name,
-            price,        // mismo precio del producto
-            quantity: 1,
-            variant       // solo texto
-            });
+            // Agregar al carrito con lógica de agrupación
+            const existingItem = cart.find(item =>
+                (item.product_id === (parent.dataset.id ? Number(parent.dataset.id) : null)) &&
+                (item.name === name) &&
+                (item.variant === variant)
+            );
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    product_id: parent.dataset.id ? Number(parent.dataset.id) : null,
+                    name,
+                    price,
+                    quantity: 1,
+                    variant
+                });
+            }
             updateCart();
             parent.classList.add('pulse');
             setTimeout(() => parent.classList.remove('pulse'), 500);
@@ -753,7 +799,19 @@ if (sendWhatsApp) {
         }
     }
 
-    const total = cart.reduce((acc, i) => acc + i.price, 0);
+    const customerName = document.getElementById('customerName').value.trim();
+    const paymentMethod = document.getElementById('paymentMethod').value;
+
+    if (!customerName) {
+        alert("Por favor ingresá tu nombre y apellido");
+        return;
+    }
+    if (!paymentMethod) {
+        alert("Por favor seleccioná un medio de pago");
+        return;
+    }
+
+    const total = cart.reduce((acc, i) => acc + (i.price * i.quantity), 0);
 
     /* ================= GUARDAR PEDIDO ================= */
     try {
@@ -761,6 +819,8 @@ if (sendWhatsApp) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                customer_name: customerName,
+                payment_method: paymentMethod,
                 items: cart,
                 total,
                 delivery_type: deliveryType.value,
@@ -781,8 +841,16 @@ if (sendWhatsApp) {
      /* ================= WHATSAPP ================= */
 
 let messageLines = [];
-messageLines.push("Hola! Quiero hacer este pedido:");
-messageLines.push("");
+messageLines.push("🍔 *NUEVO PEDIDO - ONE MORE* 🍔");
+messageLines.push("--------------------------------");
+messageLines.push(`👤 *Cliente:* ${customerName}`);
+messageLines.push(`💳 *Pago:* ${paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1)}`);
+messageLines.push(`🚚 *Entrega:* ${deliveryType.value === 'domicilio' ? 'Envío a domicilio' : 'Retiro en local'}`);
+if (deliveryType.value === "domicilio") {
+    messageLines.push(`📍 *Dirección:* ${address}`);
+}
+messageLines.push("--------------------------------");
+messageLines.push("*Detalle del pedido:*");
 
 cart.forEach(item => {
     let cleanName = item.name
@@ -790,28 +858,19 @@ cart.forEach(item => {
         .replace(/%/g, 'por ciento')
         .replace(/#/g, 'num');
 
-    if (cleanName.startsWith("Pizza Mitad y Mitad:")) {
-        const halves = cleanName.split(":")[1];
-        const [half1, half2] = halves.split("/").map(s => s.trim());
-        messageLines.push(
-            `• Pizza Mitad y Mitad (mitad ${half1} / mitad ${half2}) - $${item.price}`
-        );
-    } else {
-        messageLines.push(
-            `• ${cleanName}${item.variant ? ` (${item.variant})` : ''} - $${item.price}`
-        );
+    let itemText = `*${item.quantity}x* ${cleanName}`;
+    if (item.variant) {
+        itemText += ` _(${item.variant})_`;
     }
+    itemText += ` - $${formatPrice(item.price * item.quantity)}`;
+
+    messageLines.push(`• ${itemText}`);
 });
 
-messageLines.push("");
-messageLines.push(`Total: $${total}`);
-
-if (deliveryType.value === "domicilio") {
-    messageLines.push(`Envío a domicilio`);
-    messageLines.push(`Dirección: ${address}`);
-} else {
-    messageLines.push("Retiro en el local");
-}
+messageLines.push("--------------------------------");
+messageLines.push(`💰 *TOTAL: $${formatPrice(total)}*`);
+messageLines.push("--------------------------------");
+messageLines.push("¡Gracias por elegirnos! 😉");
 
 const phone = "5493755415870";
 const finalMessage = encodeURIComponent(messageLines.join("\n"));
