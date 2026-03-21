@@ -919,6 +919,9 @@ function showMenuSkeleton() {
 // ========= INICIALIZACIÓN AL CARGAR LA PÁGINA =========
 
 document.addEventListener('DOMContentLoaded', async function () {
+    // Registro de visita para el panel
+    fetch(`${API_BASE}/visits`, { method: 'POST' }).catch(e => console.warn("Error tracking visit"));
+
     reassignEventListeners();
 
     // 1️⃣ Esperar categorías
