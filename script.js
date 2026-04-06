@@ -429,7 +429,8 @@ async function loadMenuCategories() {
             'hamburguesas': '🍔',
             'pizzas': '🍕',
             'sandwiches': '🥪',
-            'al plato': '🍽️'
+            'al plato': '🍽️',
+            'papas fritas': '🍟'
         };
 
         categories.forEach((cat, index) => {
