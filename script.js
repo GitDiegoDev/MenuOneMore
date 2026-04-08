@@ -8,6 +8,7 @@ function formatPrice(num) {
     });
 }
 let initialLoadDone = false;
+let globalConfig = null; // Configuración global
 
 
 // ========= CONFIG ==========
@@ -135,6 +136,8 @@ async function fetchAndRenderSiteConfig() {
         } catch (e) { config = null; }
     }
 
+    globalConfig = config; // Guardar en variable global
+
     const target = document.getElementById('site-hours');
     if (!target) return;
 
@@ -242,7 +245,7 @@ function handleMenuBlocking(config) {
         banner.className = 'day-off-banner';
         banner.innerHTML = `
             <div style="font-size: 32px; margin-bottom: 10px;">😴</div>
-            <div>Hoy descansamos, nos encontramos nuevamente mañana</div>
+            <div>Hoy descansamos, pero podés navegar el menú y dejar tu pedido programado.</div>
         `;
 
         // Insert after header
@@ -254,11 +257,26 @@ function handleMenuBlocking(config) {
         }
 
         container.classList.add('menu-locked');
-        cartBtn.classList.add('cart-hidden');
+        cartBtn.classList.remove('cart-hidden');
     } else if (!openNow) {
-        // Just locked because it's outside business hours
+        // Create and insert "closed" banner
+        const banner = document.createElement('div');
+        banner.className = 'day-off-banner';
+        banner.innerHTML = `
+            <div style="font-size: 32px; margin-bottom: 10px;">🕒</div>
+            <div>¡Estamos cerrados! Pero podés navegar el menú y dejar tu pedido programado para cuando abramos.</div>
+        `;
+
+        // Insert after header
+        const header = container.querySelector('.header');
+        if (header) {
+            header.insertAdjacentElement('afterend', banner);
+        } else {
+            container.prepend(banner);
+        }
+
         container.classList.add('menu-locked');
-        cartBtn.classList.add('cart-hidden');
+        cartBtn.classList.remove('cart-hidden');
     } else {
         // Open and working
         container.classList.remove('menu-locked');
@@ -523,6 +541,19 @@ function updateCart() {
     });
 
     cartTotal.textContent = "Total: $" + formatPrice(total);
+
+    // Manejo de visibilidad de programación de pedido
+    const schedulingContainer = document.getElementById('schedulingContainer');
+    const scheduledTimeInput = document.getElementById('scheduledTime');
+
+    if (globalConfig && (!isOpenNow(globalConfig) || isDayOff(globalConfig))) {
+        if (schedulingContainer) schedulingContainer.style.display = 'block';
+        if (scheduledTimeInput && !scheduledTimeInput.value && globalConfig.open_time) {
+            scheduledTimeInput.value = globalConfig.open_time;
+        }
+    } else {
+        if (schedulingContainer) schedulingContainer.style.display = 'none';
+    }
 }
 
 function changeQuantity(index, delta) {
@@ -812,6 +843,16 @@ if (sendWhatsApp) {
         return;
     }
 
+    const isClosed = globalConfig && (!isOpenNow(globalConfig) || isDayOff(globalConfig));
+    let scheduledTime = null;
+    if (isClosed) {
+        scheduledTime = document.getElementById('scheduledTime').value;
+        if (!scheduledTime) {
+            alert("Por favor seleccioná un horario para tu pedido programado");
+            return;
+        }
+    }
+
     const total = cart.reduce((acc, i) => acc + (i.price * i.quantity), 0);
 
     /* ================= GUARDAR PEDIDO ================= */
@@ -825,7 +866,8 @@ if (sendWhatsApp) {
                 items: cart,
                 total,
                 delivery_type: deliveryType.value,
-                address
+                address,
+                scheduled_time: scheduledTime
             })
         });
 
@@ -843,6 +885,9 @@ if (sendWhatsApp) {
 
 let messageLines = [];
 messageLines.push("🍔 *NUEVO PEDIDO - ONE MORE* 🍔");
+if (scheduledTime) {
+    messageLines.push(`🕒 *PEDIDO PROGRAMADO: ${scheduledTime}*`);
+}
 messageLines.push("--------------------------------");
 messageLines.push(`👤 *Cliente:* ${customerName}`);
 messageLines.push(`💳 *Pago:* ${paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1)}`);
