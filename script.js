@@ -767,6 +767,8 @@ const envioDomicilio = document.getElementById('envioDomicilio');
 const retiroLocal = document.getElementById('retiroLocal');
 const direccionContainer = document.getElementById('direccionContainer');
 
+let gpsLocation = null;
+
 if (envioDomicilio && retiroLocal && direccionContainer) {
     envioDomicilio.addEventListener('change', () => {
         direccionContainer.style.display = 'block';
@@ -774,8 +776,56 @@ if (envioDomicilio && retiroLocal && direccionContainer) {
 
     retiroLocal.addEventListener('change', () => {
         direccionContainer.style.display = 'none';
+        gpsLocation = null;
+        const status = document.getElementById('gpsStatus');
+        const input = document.getElementById('direccionInput');
+        if (status) status.textContent = '';
+        if (input) input.value = '';
     });
 }
+
+// Lógica de Geolocalización
+document.getElementById('getGPSLocation')?.addEventListener('click', function() {
+    const btn = this;
+    const status = document.getElementById('gpsStatus');
+    const input = document.getElementById('direccionInput');
+
+    if (!navigator.geolocation) {
+        status.textContent = "Tu navegador no soporta geolocalización.";
+        status.className = "gps-status error";
+        return;
+    }
+
+    btn.disabled = true;
+    btn.classList.add('loading');
+    status.textContent = "Obteniendo ubicación...";
+    status.className = "gps-status";
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const { latitude, longitude } = position.coords;
+            gpsLocation = { latitude, longitude };
+
+            input.value = "Ubicación por GPS capturada 📍";
+            status.textContent = "¡Ubicación obtenida con éxito!";
+            status.className = "gps-status success";
+
+            btn.disabled = false;
+            btn.classList.remove('loading');
+        },
+        (error) => {
+            console.error(error);
+            let msg = "Error al obtener ubicación.";
+            if (error.code === 1) msg = "Permiso denegado.";
+
+            status.textContent = msg;
+            status.className = "gps-status error";
+            btn.disabled = false;
+            btn.classList.remove('loading');
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+});
 
 const sendWhatsApp = document.getElementById('sendWhatsApp');
 if (sendWhatsApp) {
@@ -814,6 +864,12 @@ if (sendWhatsApp) {
 
     const total = cart.reduce((acc, i) => acc + (i.price * i.quantity), 0);
 
+    // Si hay ubicación GPS, crear el enlace de Maps
+    let mapsLink = "";
+    if (gpsLocation) {
+        mapsLink = `https://www.google.com/maps?q=${gpsLocation.latitude},${gpsLocation.longitude}`;
+    }
+
     /* ================= GUARDAR PEDIDO ================= */
     try {
         const response = await fetch(`${API_BASE}/orders`, {
@@ -825,7 +881,7 @@ if (sendWhatsApp) {
                 items: cart,
                 total,
                 delivery_type: deliveryType.value,
-                address
+                address: mapsLink ? `${address} (${mapsLink})` : address
             })
         });
 
@@ -849,6 +905,9 @@ messageLines.push(`💳 *Pago:* ${paymentMethod.charAt(0).toUpperCase() + paymen
 messageLines.push(`🚚 *Entrega:* ${deliveryType.value === 'domicilio' ? 'Envío a domicilio' : 'Retiro en local'}`);
 if (deliveryType.value === "domicilio") {
     messageLines.push(`📍 *Dirección:* ${address}`);
+    if (mapsLink) {
+        messageLines.push(`🗺️ *Mapa:* ${mapsLink}`);
+    }
 }
 messageLines.push("--------------------------------");
 messageLines.push("*Detalle del pedido:*");
