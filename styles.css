@@ -1194,3 +1194,51 @@ body {
     display: none !important;
 }
 
+/* Estilos para el botón de GPS */
+.gps-button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    background: #fff;
+    color: #ff6b35;
+    border: 2px solid #ff6b35;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.gps-button:hover {
+    background: #fff5f2;
+    transform: translateY(-2px);
+}
+
+.gps-button:active {
+    transform: translateY(0);
+}
+
+.gps-button.loading {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.gps-status {
+    font-size: 12px;
+    margin-top: 5px;
+    text-align: center;
+    color: #666;
+    min-height: 18px;
+}
+
+.gps-status.error {
+    color: #dc3545;
+}
+
+.gps-status.success {
+    color: #25D366;
+}
