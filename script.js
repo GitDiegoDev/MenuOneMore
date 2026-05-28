@@ -329,6 +329,7 @@ async function fetchAndRenderProducts() {
             if (!container) return;
 
             const isNew = p.is_new || p.isNew || isProductNew(p.created_at);
+            const isBurger = isBurgerDay() && container.dataset.category === 'hamburguesas';
             const price = p.price ?? 0;
             const hasVariants = p.variants && p.variants.length > 0;
             const imageHtml =
@@ -337,15 +338,15 @@ async function fetchAndRenderProducts() {
                     : '';
 
             const div = document.createElement('div');
-            div.className = 'menu-item' + (isNew ? ' new-product-highlight destacado' : '');
+            div.className = 'menu-item' + (isNew ? ' new-product-highlight destacado' : '') + (isBurger ? ' burger-day-special destacado' : '');
             div.dataset.id = p.id;
             div.dataset.item = p.name;
             div.dataset.price = price;
 
             div.innerHTML = `
                 <div class="click-indicator"></div>
-                ${isNew ? '<div class="new-badge">NUEVO ⭐</div>' : ''}
-                ${isNew ? '<div class="savings-badge">¡NUEVO!</div>' : ''}
+                ${isBurger ? '<div class="new-badge">🔥 TOP DÍA 🔥</div>' : (isNew ? '<div class="new-badge">NUEVO ⭐</div>' : '')}
+                ${isBurger ? '<div class="savings-badge">¡FELIZ DÍA! 🍔</div>' : (isNew ? '<div class="savings-badge">¡NUEVO!</div>' : '')}
                 ${imageHtml}
 
                 <div class="item-header">
@@ -357,7 +358,7 @@ async function fetchAndRenderProducts() {
 
                 <div class="item-details">
                     ${hasVariants ? renderVariantSelect(p.variants, p.description) : ''}
-                    <button class="add-to-order">+ Agregar al pedido</button>
+                    <button class="add-to-order">${isBurger ? '🍔 ¡Quiero mi Burger!' : '+ Agregar al pedido'}</button>
                 </div>
             `;
 
@@ -478,6 +479,11 @@ async function loadMenuCategories() {
             // 👇 MARCAR PIZZAS
             if (cat.name.toLowerCase().includes('pizza')) {
                 section.dataset.category = 'pizzas';
+            }
+
+            // 👇 MARCAR HAMBURGUESAS
+            if (cat.name.toLowerCase().includes('hamburguesa') || cat.name.toLowerCase().includes('burger')) {
+                section.dataset.category = 'hamburguesas';
             }
 
             menuContainer.appendChild(section);
