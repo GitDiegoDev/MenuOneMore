@@ -18,6 +18,12 @@ function esJueves() {
     const hoy = new Date().getDay();
     return hoy === 4; // jueves = 4
 }
+// Función para saber si es el Día de la Hamburguesa (28 de Mayo)
+function isBurgerDay() {
+    const today = new Date();
+    // getMonth() devuelve 0 para enero, 4 para mayo
+    return today.getMonth() === 4 && today.getDate() === 28;
+}
 // Función para saber si coincide el día configurado
 function coincideDia(day) {
     const hoy = new Date().getDay(); // 0-6
@@ -70,10 +76,14 @@ async function fetchAndRenderPromos() {
         const firstSection = menuContainer.querySelector('.menu-section') || document.querySelector('.menu-section');
         if (!firstSection) return;
         if (!firstSection.querySelector('.promo-banner')) {
+            const isBurger = isBurgerDay();
+            const bannerTitle = isBurger ? "🍔 ¡FELIZ DÍA DE LA HAMBURGUESA! 🍔" : "🎉 PROMO DEL DÍA 🎉";
+            const bannerP = isBurger ? "¡Festejá con nuestras burgers en promo!" : "¡Aprovechá nuestras promos especiales de hoy!";
+
             firstSection.insertAdjacentHTML("afterbegin", `
-                <div class="promo-banner">
-                    <h2>🎉 PROMO DEL DÍA 🎉</h2>
-                    <p>¡Aprovechá nuestras promos especiales de hoy!</p>
+                <div class="promo-banner ${isBurger ? 'burger-day-banner' : ''}">
+                    <h2>${bannerTitle}</h2>
+                    <p>${bannerP}</p>
                 </div>
                 <div class="solo-hoy-badge">¡SOLO HOY!</div>
             `);
@@ -82,14 +92,20 @@ async function fetchAndRenderPromos() {
         // Render de cada promo
         promosHoy.forEach(promo => {
             const price = promo.price ?? 0;
+            const isBurger = isBurgerDay() && (
+                promo.title.toLowerCase().includes('burger') ||
+                promo.title.toLowerCase().includes('hamburguesa') ||
+                promo.description.toLowerCase().includes('burger') ||
+                promo.description.toLowerCase().includes('hamburguesa')
+            );
 
             const promoHTML = `
-                <div class="menu-item promo-item destacado"
+                <div class="menu-item promo-item destacado ${isBurger ? 'burger-day-special' : ''}"
                     data-item="${escapeHTML(promo.title)}"
                     data-price="${price}">
 
-                    <div class="new-badge">NUEVO ⭐</div>
-                    <div class="savings-badge">${promo.savings_badge ?? "Promo especial"}</div>
+                    <div class="new-badge">${isBurger ? '🔥 TOP DÍA 🔥' : 'NUEVO ⭐'}</div>
+                    <div class="savings-badge">${promo.savings_badge ?? (isBurger ? "¡Especial Burger Day!" : "Promo especial")}</div>
 
                     <div class="item-header">
                         <div class="item-name">${escapeHTML(promo.title).toUpperCase()}</div>
@@ -100,14 +116,23 @@ async function fetchAndRenderPromos() {
 
                     <div class="item-details">
                         <button class="add-to-order promo-button">
-                            🎉 Agregar PROMO al pedido
+                            ${isBurger ? '🍔 ¡Quiero mi Burger!' : '🎉 Agregar PROMO al pedido'}
                         </button>
                     </div>
                 </div>
             `;
 
             // Insertar cada promo como primer elemento dentro de la sección (mantiene estructura)
-            firstSection.insertAdjacentHTML("afterbegin", promoHTML);
+            // Si es Burger Day, las ponemos ARRIBA del banner si queremos, o simplemente debajo.
+            // El banner ya está en "afterbegin".
+            // Para que aparezcan DEBAJO del banner pero arriba de todo lo demás,
+            // podemos insertarlas después del banner.
+            const banner = firstSection.querySelector('.promo-banner');
+            if (banner) {
+                banner.insertAdjacentHTML("afterend", promoHTML);
+            } else {
+                firstSection.insertAdjacentHTML("afterbegin", promoHTML);
+            }
         });
 
         reassignEventListeners();
