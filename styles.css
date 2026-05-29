@@ -1052,55 +1052,6 @@ body {
     transform: scale(1.02);
 }
 
-/* Burger Day Surprise Styles */
-.burger-day-banner {
-    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%) !important;
-    border: 2px solid #f1c40f;
-}
-
-.burger-day-special {
-    border: 3px solid #f1c40f !important;
-    background: #fffdf2 !important;
-    animation: burgerGlow 3s infinite;
-}
-
-@keyframes burgerGlow {
-    0% { box-shadow: 0 0 5px #f1c40f; }
-    50% { box-shadow: 0 0 20px #f39c12, 0 0 30px #e67e22; }
-    100% { box-shadow: 0 0 5px #f1c40f; }
-}
-
-.burger-day-special::before {
-    content: '🍔';
-    position: absolute;
-    left: -15px;
-    top: -15px;
-    font-size: 24px;
-    animation: burgerFloat 2s ease-in-out infinite;
-    z-index: 20;
-}
-
-@keyframes burgerFloat {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-10px) rotate(15deg); }
-}
-
-.burger-day-special .item-name {
-    color: #d35400 !important;
-}
-
-.burger-day-special .promo-button {
-    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%) !important;
-    animation: shake 5s infinite;
-}
-
-@keyframes shake {
-    0%, 90%, 100% { transform: translate(0, 0); }
-    91% { transform: translate(-2px, 0); }
-    92% { transform: translate(2px, 0); }
-    93% { transform: translate(-2px, 0); }
-    94% { transform: translate(2px, 0); }
-}
 
 
 
