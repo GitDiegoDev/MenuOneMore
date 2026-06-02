@@ -1147,6 +1147,126 @@ body {
         padding: 10px 15px;
     }
 }
+
+/* ===== ESTILOS PARA FIDELIDAD (CLUB ONE MORE) ===== */
+.loyalty-badge {
+    background: #1a1a1a;
+    color: #ff6b35;
+    padding: 8px 15px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 10px;
+    border: 1px solid #ff6b35;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(255, 107, 53, 0.1);
+}
+
+.loyalty-badge:hover {
+    background: #ff6b35;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 107, 53, 0.3);
+}
+
+.loyalty-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(5px);
+}
+
+.loyalty-modal.active {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+.loyalty-info {
+    text-align: center;
+    margin-bottom: 25px;
+    background: #fff9f6;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px dashed #ff6b35;
+}
+
+.loyalty-info p {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.4;
+}
+
+.loyalty-sub {
+    font-size: 12px !important;
+    color: #666 !important;
+    margin-top: 5px;
+}
+
+.stamps-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.stamp-slot {
+    aspect-ratio: 1;
+    background: #f0f0f0;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #ccc;
+    position: relative;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.stamp-slot.active {
+    background: #fff;
+    border-color: #ff6b35;
+    color: #ff6b35;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 107, 53, 0.4);
+}
+
+.stamp-slot.active::after {
+    content: '✅';
+    position: absolute;
+    font-size: 12px;
+    bottom: -5px;
+    right: -5px;
+    background: white;
+    border-radius: 50%;
+    padding: 2px;
+}
+
+.loyalty-status {
+    text-align: center;
+    font-weight: bold;
+    color: #1a1a1a;
+    font-size: 15px;
+    padding: 10px;
+}
+
+@media (max-width: 400px) {
+    .stamps-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
 /* Estilos para el ítem de Mitad & Mitad */
 .half-half-promo-item {
     border: 3px solid #ff6b35 !important;

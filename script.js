@@ -279,6 +279,55 @@ function handleMenuBlocking(config) {
 
 
 
+// ========= SISTEMA DE FIDELIDAD (CLUB ONE MORE) =========
+
+const LOYALTY_STORAGE_KEY = 'one_more_stamps';
+const MAX_STAMPS = 10;
+
+function getStamps() {
+    return parseInt(localStorage.getItem(LOYALTY_STORAGE_KEY)) || 0;
+}
+
+function setStamps(count) {
+    localStorage.setItem(LOYALTY_STORAGE_KEY, count);
+}
+
+function renderLoyaltyCard() {
+    const stampsGrid = document.getElementById('stampsGrid');
+    const loyaltyStatus = document.getElementById('loyaltyStatus');
+    if (!stampsGrid || !loyaltyStatus) return;
+
+    const currentStamps = getStamps();
+    stampsGrid.innerHTML = '';
+
+    for (let i = 1; i <= MAX_STAMPS; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'stamp-slot' + (i <= currentStamps ? ' active' : '');
+        slot.innerHTML = '🍔';
+        stampsGrid.appendChild(slot);
+    }
+
+    if (currentStamps >= MAX_STAMPS) {
+        loyaltyStatus.innerHTML = '🎉 ¡FELICITACIONES! Tenés una recompensa lista.';
+    } else {
+        loyaltyStatus.textContent = `Te faltan ${MAX_STAMPS - currentStamps} sellos para tu premio.`;
+    }
+}
+
+const openLoyalty = document.getElementById('openLoyalty');
+const loyaltyModal = document.getElementById('loyaltyModal');
+const closeLoyalty = document.getElementById('closeLoyalty');
+
+if (openLoyalty && loyaltyModal && closeLoyalty) {
+    openLoyalty.addEventListener('click', () => {
+        loyaltyModal.classList.add('active');
+        renderLoyaltyCard();
+    });
+    closeLoyalty.addEventListener('click', () => {
+        loyaltyModal.classList.remove('active');
+    });
+}
+
 // ========= SISTEMA PRINCIPAL & RENDER DINÁMICO =========
 
 // Función para saber si un producto es nuevo (creado en los últimos 30 días)
@@ -886,6 +935,18 @@ cart.forEach(item => {
 
 messageLines.push("--------------------------------");
 messageLines.push(`💰 *TOTAL: $${formatPrice(total)}*`);
+
+    // Lógica de fidelidad en el mensaje
+    const currentStamps = getStamps();
+    if (currentStamps >= MAX_STAMPS) {
+        messageLines.push("--------------------------------");
+        messageLines.push("🎁 *¡RECOMPENSA RECLAMADA!*");
+        messageLines.push("_Este cliente completó su tarjeta y reclama su Hamburguesa Simple de regalo._");
+    } else {
+        messageLines.push("--------------------------------");
+        messageLines.push(`⭐️ Sello ${currentStamps + 1} de 10`);
+    }
+
 messageLines.push("--------------------------------");
 messageLines.push("¡Gracias por elegirnos! 😉");
 
@@ -897,6 +958,14 @@ showWhatsappLoading();
 setTimeout(() => {
 window.location.href = `https://wa.me/${phone}?text=${finalMessage}`;
 }, 600);
+
+/* ================= FIDELIDAD ================= */
+const stamps = getStamps();
+if (stamps >= MAX_STAMPS) {
+    setStamps(0); // Reset tras canje
+} else {
+    setStamps(stamps + 1);
+}
 
 /* ================= LIMPIAR ================= */
 cart = [];

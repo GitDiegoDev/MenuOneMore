@@ -26,6 +26,9 @@
             <div class="order-instruction">
                 <span>🍔</span> Pedí por acá 😉
             </div>
+            <div class="loyalty-badge" id="openLoyalty">
+                <span>⭐️</span> Club One More
+            </div>
             <div id="site-hours" class="site-hours" style="margin-top:8px; color:#333; font-weight:600;"></div>
         </div>
 
@@ -128,6 +131,26 @@
             <button class="whatsapp-button" id="sendWhatsApp">
                 <span>📱</span> Enviar pedido por WhatsApp
             </button>
+        </div>
+    </div>
+
+    <!-- Modal de Fidelidad (Club One More) -->
+    <div class="loyalty-modal" id="loyaltyModal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>⭐️ Club One More</h2>
+                <button class="close-cart" id="closeLoyalty">×</button>
+            </div>
+            <div class="loyalty-info">
+                <p>¡Completá tu tarjeta y llevate una <strong>Hamburguesa Simple de regalo!</strong> 🎁</p>
+                <p class="loyalty-sub">Sumás 1 sello con cada pedido realizado.</p>
+            </div>
+            <div class="stamps-grid" id="stampsGrid">
+                <!-- Los sellos se generarán dinámicamente -->
+            </div>
+            <div class="loyalty-status" id="loyaltyStatus">
+                Te faltan 10 sellos para tu premio.
+            </div>
         </div>
     </div>
 
