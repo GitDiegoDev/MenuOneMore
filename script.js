@@ -817,10 +817,15 @@ if (sendWhatsApp) {
     }
 
     const customerName = document.getElementById('customerName').value.trim();
+    const customerPhone = document.getElementById('customerPhone').value.trim();
     const paymentMethod = document.getElementById('paymentMethod').value;
 
     if (!customerName) {
         alert("Por favor ingresá tu nombre y apellido");
+        return;
+    }
+    if (!customerPhone) {
+        alert("Por favor ingresá tu número de teléfono");
         return;
     }
     if (!paymentMethod) {
@@ -829,6 +834,10 @@ if (sendWhatsApp) {
     }
 
     const total = cart.reduce((acc, i) => acc + (i.price * i.quantity), 0);
+
+    /* ================= PERSISTENCIA LOCAL ================= */
+    localStorage.setItem('clienteNombre', customerName);
+    localStorage.setItem('clienteTelefono', customerPhone);
 
     /* ================= GUARDAR PEDIDO ================= */
     try {
@@ -938,6 +947,12 @@ function showMenuSkeleton() {
 document.addEventListener('DOMContentLoaded', async function () {
     // Registro de visita para el panel
     fetch(`${API_BASE}/visits`, { method: 'POST' }).catch(e => console.warn("Error tracking visit"));
+
+    // Autocompletar datos del cliente si existen
+    const savedName = localStorage.getItem('clienteNombre');
+    const savedPhone = localStorage.getItem('clienteTelefono');
+    if (savedName) document.getElementById('customerName').value = savedName;
+    if (savedPhone) document.getElementById('customerPhone').value = savedPhone;
 
     reassignEventListeners();
 
