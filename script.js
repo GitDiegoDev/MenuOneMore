@@ -19,34 +19,43 @@ let clubData = {
     nombre: '',
     sellos_actuales: 0,
     premios_disponibles: 0,
-    faltan: 10
+    faltan: 10,
+    is_loading: false
 };
 
 // --- Fidelity API Functions ---
 async function fetchCustomerFidelity(phone) {
     if (!phone) return;
+    clubData.is_loading = true;
+    renderFidelityCard();
     try {
         const response = await fetch(`${API_BASE}/clientes/${phone}`);
         if (response.ok) {
             const data = await response.json();
             clubData = {
                 nombre: data.nombre || '',
-                sellos_actuales: data.sellos_actuales || 0,
-                premios_disponibles: data.premios_disponibles || 0,
-                faltan: data.faltan || 10
+                sellos_actuales: data.sellos_actuales ?? 0,
+                premios_disponibles: data.premios_disponibles ?? 0,
+                faltan: data.faltan ?? 10,
+                is_loading: false
             };
             console.log("Fidelity data loaded:", clubData);
-            renderFidelityCard(); // Update UI if modal is open
         } else {
             console.warn("Customer not found or error fetching fidelity data");
+            clubData.is_loading = false;
         }
     } catch (error) {
         console.error("Error fetching fidelity data:", error);
+        clubData.is_loading = false;
+    } finally {
+        renderFidelityCard();
     }
 }
 
 async function registerOrderFidelity(nombre, telefono) {
     if (!nombre || !telefono) return;
+    clubData.is_loading = true;
+    renderFidelityCard();
     try {
         const response = await fetch(`${API_BASE}/clientes/pedido`, {
             method: 'POST',
@@ -57,19 +66,23 @@ async function registerOrderFidelity(nombre, telefono) {
             const data = await response.json();
             clubData = {
                 nombre: data.nombre || nombre,
-                sellos_actuales: data.sellos_actuales || 0,
-                premios_disponibles: data.premios_disponibles || 0,
-                faltan: data.faltan || 10
+                sellos_actuales: data.sellos_actuales ?? 0,
+                premios_disponibles: data.premios_disponibles ?? 0,
+                faltan: data.faltan ?? 10,
+                is_loading: false
             };
             console.log("Fidelity registration successful:", clubData);
-            renderFidelityCard();
         } else {
             console.error("Error registering order for fidelity");
             alert("No se pudo registrar el sello en el Club One More, pero tu pedido se enviará igual.");
+            clubData.is_loading = false;
         }
     } catch (error) {
         console.error("Error registering order for fidelity:", error);
         alert("Ocurrió un error al conectar con el Club One More, pero tu pedido se enviará igual.");
+        clubData.is_loading = false;
+    } finally {
+        renderFidelityCard();
     }
 }
 
@@ -833,7 +846,14 @@ const closeFidelityBtn = document.getElementById('closeFidelity');
 if (openFidelityBtn) {
     openFidelityBtn.addEventListener('click', () => {
         fidelityModal.classList.add('active');
-        renderFidelityCard();
+
+        // Refrescar datos al abrir por si hubo cambios
+        const phone = localStorage.getItem('telefono') || localStorage.getItem('clienteTelefono');
+        if (phone) {
+            fetchCustomerFidelity(phone);
+        } else {
+            renderFidelityCard();
+        }
     });
 }
 
@@ -847,8 +867,19 @@ function renderFidelityCard() {
     const container = document.getElementById('fidelityCardContainer');
     if (!container) return;
 
-    // Si no hay sellos, mostrar explicación
-    if (clubData.sellos_actuales === 0) {
+    if (clubData.is_loading) {
+        container.innerHTML = `
+            <div class="fidelity-card-title">Club One More</div>
+            <div style="padding: 40px 0;">
+                <div class="wa-spinner"></div>
+                <p>Cargando tus datos...</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Si no tenemos nombre, es un cliente nuevo o no identificado
+    if (!clubData.nombre) {
         container.innerHTML = `
             <div class="fidelity-card-title">Club One More</div>
             <div class="fidelity-welcome">
@@ -865,13 +896,22 @@ function renderFidelityCard() {
             </button>
         `;
     } else {
-        // Si tiene sellos, mostrar tarjeta con sellos
+        // Si tiene nombre, mostrar tarjeta con sellos y datos reales
         let stampsHtml = '';
         for (let i = 1; i <= 10; i++) {
             const isActive = i <= clubData.sellos_actuales;
             stampsHtml += `
                 <div class="stamp ${isActive ? 'active' : ''}">
                     ${isActive ? '🍔' : ''}
+                </div>
+            `;
+        }
+
+        let rewardsHtml = '';
+        if (clubData.premios_disponibles > 0) {
+            rewardsHtml = `
+                <div class="fidelity-rewards">
+                    🎁 ¡Tenés ${clubData.premios_disponibles} ${clubData.premios_disponibles === 1 ? 'recompensa disponible' : 'recompensas disponibles'}!
                 </div>
             `;
         }
@@ -883,13 +923,15 @@ function renderFidelityCard() {
                 <p>Estás cada vez más cerca de tu recompensa.</p>
             </div>
 
+            ${rewardsHtml}
+
             <div class="stamps-grid">
                 ${stampsHtml}
             </div>
 
             <div class="fidelity-status">
                 ${clubData.faltan === 0
-                    ? "¡Felicidades! Tenés una recompensa disponible 🎁"
+                    ? "¡Felicidades! Tenés una recompensa lista 🎁"
                     : `Te faltan ${clubData.faltan} sellos para tu premio.`}
             </div>
 
