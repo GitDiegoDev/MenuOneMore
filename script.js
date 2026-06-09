@@ -36,6 +36,7 @@ async function fetchCustomerFidelity(phone) {
                 faltan: data.faltan || 10
             };
             console.log("Fidelity data loaded:", clubData);
+            renderFidelityCard(); // Update UI if modal is open
         } else {
             console.warn("Customer not found or error fetching fidelity data");
         }
@@ -61,6 +62,7 @@ async function registerOrderFidelity(nombre, telefono) {
                 faltan: data.faltan || 10
             };
             console.log("Fidelity registration successful:", clubData);
+            renderFidelityCard();
         } else {
             console.error("Error registering order for fidelity");
             alert("No se pudo registrar el sello en el Club One More, pero tu pedido se enviará igual.");
@@ -821,6 +823,83 @@ function reassignEventListeners() {
         });
     });
 }
+
+// ========= FIDELITY SYSTEM (CLUB ONE MORE) =========
+
+const fidelityModal = document.getElementById('fidelityModal');
+const openFidelityBtn = document.getElementById('openFidelity');
+const closeFidelityBtn = document.getElementById('closeFidelity');
+
+if (openFidelityBtn) {
+    openFidelityBtn.addEventListener('click', () => {
+        fidelityModal.classList.add('active');
+        renderFidelityCard();
+    });
+}
+
+if (closeFidelityBtn) {
+    closeFidelityBtn.addEventListener('click', () => {
+        fidelityModal.classList.remove('active');
+    });
+}
+
+function renderFidelityCard() {
+    const container = document.getElementById('fidelityCardContainer');
+    if (!container) return;
+
+    // Si no hay sellos, mostrar explicación
+    if (clubData.sellos_actuales === 0) {
+        container.innerHTML = `
+            <div class="fidelity-card-title">Club One More</div>
+            <div class="fidelity-welcome">
+                <h4>¡Empieza a acumular recompensas!</h4>
+                <p>Realiza tu primer pedido para unirte al programa de fidelización.</p>
+
+                <div class="fidelity-explanation">
+                    <div>🎁 Cada compra suma 1 sello.</div>
+                    <div>🎁 Al completar 10 sellos obtendrás una recompensa.</div>
+                </div>
+            </div>
+            <button class="add-to-order" onclick="document.getElementById('fidelityModal').classList.remove('active')">
+                ¡Entendido!
+            </button>
+        `;
+    } else {
+        // Si tiene sellos, mostrar tarjeta con sellos
+        let stampsHtml = '';
+        for (let i = 1; i <= 10; i++) {
+            const isActive = i <= clubData.sellos_actuales;
+            stampsHtml += `
+                <div class="stamp ${isActive ? 'active' : ''}">
+                    ${isActive ? '🍔' : ''}
+                </div>
+            `;
+        }
+
+        container.innerHTML = `
+            <div class="fidelity-card-title">Club One More</div>
+            <div class="fidelity-welcome">
+                <h4>¡Hola, ${escapeHTML(clubData.nombre)}!</h4>
+                <p>Estás cada vez más cerca de tu recompensa.</p>
+            </div>
+
+            <div class="stamps-grid">
+                ${stampsHtml}
+            </div>
+
+            <div class="fidelity-status">
+                ${clubData.faltan === 0
+                    ? "¡Felicidades! Tenés una recompensa disponible 🎁"
+                    : `Te faltan ${clubData.faltan} sellos para tu premio.`}
+            </div>
+
+            <div class="fidelity-footer">
+                Válido para un sello por pedido.
+            </div>
+        `;
+    }
+}
+
 
 // ========= CONFIG DEL CARRITO Y WHATSAPP =========
 
