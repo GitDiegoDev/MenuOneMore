@@ -13,6 +13,64 @@ let initialLoadDone = false;
 // ========= CONFIG ==========
 const API_BASE = "https://backend-menu-production.up.railway.app/api";
 const API = API_BASE;
+
+// --- Club One More State ---
+let clubData = {
+    nombre: '',
+    sellos_actuales: 0,
+    premios_disponibles: 0,
+    faltan: 10
+};
+
+// --- Fidelity API Functions ---
+async function fetchCustomerFidelity(phone) {
+    if (!phone) return;
+    try {
+        const response = await fetch(`${API_BASE}/clientes/${phone}`);
+        if (response.ok) {
+            const data = await response.json();
+            clubData = {
+                nombre: data.nombre || '',
+                sellos_actuales: data.sellos_actuales || 0,
+                premios_disponibles: data.premios_disponibles || 0,
+                faltan: data.faltan || 10
+            };
+            console.log("Fidelity data loaded:", clubData);
+        } else {
+            console.warn("Customer not found or error fetching fidelity data");
+        }
+    } catch (error) {
+        console.error("Error fetching fidelity data:", error);
+    }
+}
+
+async function registerOrderFidelity(nombre, telefono) {
+    if (!nombre || !telefono) return;
+    try {
+        const response = await fetch(`${API_BASE}/clientes/pedido`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre, telefono })
+        });
+        if (response.ok) {
+            const data = await response.json();
+            clubData = {
+                nombre: data.nombre || nombre,
+                sellos_actuales: data.sellos_actuales || 0,
+                premios_disponibles: data.premios_disponibles || 0,
+                faltan: data.faltan || 10
+            };
+            console.log("Fidelity registration successful:", clubData);
+        } else {
+            console.error("Error registering order for fidelity");
+            alert("No se pudo registrar el sello en el Club One More, pero tu pedido se enviará igual.");
+        }
+    } catch (error) {
+        console.error("Error registering order for fidelity:", error);
+        alert("Ocurrió un error al conectar con el Club One More, pero tu pedido se enviará igual.");
+    }
+}
+
 // Función para saber si es jueves
 function esJueves() {
     const hoy = new Date().getDay();
@@ -773,6 +831,16 @@ const closeCart = document.getElementById('closeCart');
 cartBtn.addEventListener('click', () => {
     cartModal.classList.add('active');
     updateCart();
+
+    // Asegurar que el formulario esté al día con localStorage al abrir
+    const savedName = localStorage.getItem('nombre') || localStorage.getItem('clienteNombre');
+    const savedPhone = localStorage.getItem('telefono') || localStorage.getItem('clienteTelefono');
+    if (savedName && !document.getElementById('customerName').value) {
+        document.getElementById('customerName').value = savedName;
+    }
+    if (savedPhone && !document.getElementById('customerPhone').value) {
+        document.getElementById('customerPhone').value = savedPhone;
+    }
 });
 
 closeCart.addEventListener('click', () => {
@@ -836,8 +904,15 @@ if (sendWhatsApp) {
     const total = cart.reduce((acc, i) => acc + (i.price * i.quantity), 0);
 
     /* ================= PERSISTENCIA LOCAL ================= */
+    localStorage.setItem('nombre', customerName);
+    localStorage.setItem('telefono', customerPhone);
+    // Mantener compatibilidad
     localStorage.setItem('clienteNombre', customerName);
     localStorage.setItem('clienteTelefono', customerPhone);
+
+    /* ================= CLUB ONE MORE (FIDELIZACIÓN) ================= */
+    // Registramos el pedido para sumar sellos antes de enviar a WhatsApp
+    await registerOrderFidelity(customerName, customerPhone);
 
     /* ================= GUARDAR PEDIDO ================= */
     try {
@@ -948,11 +1023,17 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Registro de visita para el panel
     fetch(`${API_BASE}/visits`, { method: 'POST' }).catch(e => console.warn("Error tracking visit"));
 
-    // Autocompletar datos del cliente si existen
-    const savedName = localStorage.getItem('clienteNombre');
-    const savedPhone = localStorage.getItem('clienteTelefono');
+    // Autocompletar datos del cliente si existen (usando nuevas claves 'nombre' y 'telefono')
+    // Mantenemos compatibilidad con las claves anteriores temporalmente
+    const savedName = localStorage.getItem('nombre') || localStorage.getItem('clienteNombre');
+    const savedPhone = localStorage.getItem('telefono') || localStorage.getItem('clienteTelefono');
+
     if (savedName) document.getElementById('customerName').value = savedName;
-    if (savedPhone) document.getElementById('customerPhone').value = savedPhone;
+    if (savedPhone) {
+        document.getElementById('customerPhone').value = savedPhone;
+        // Si existe teléfono, consultamos fidelidad
+        fetchCustomerFidelity(savedPhone);
+    }
 
     reassignEventListeners();
 
