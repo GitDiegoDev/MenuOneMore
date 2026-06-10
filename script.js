@@ -948,7 +948,7 @@ function renderFidelityCard() {
             const isActive = i <= clubData.sellos_actuales;
             stampsHtml += `
                 <div class="stamp ${isActive ? 'active' : ''}">
-                    ${isActive ? '🍔' : ''}
+                    ${isActive ? '<img src="img/logo.png" class="stamp-logo" alt="Logo">' : ''}
                 </div>
             `;
         }
