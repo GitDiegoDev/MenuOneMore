@@ -28,7 +28,8 @@ async function fetchCustomerFidelity(phone) {
     try {
         const response = await fetch(`${API_BASE}/clientes/${phone}`);
         if (response.ok) {
-            const data = await response.json();
+            const json = await response.json();
+            const data = json.data;
             clubData = {
                 nombre: data.nombre || '',
                 sellos_actuales: data.sellos_actuales || 0,
@@ -54,7 +55,8 @@ async function registerOrderFidelity(nombre, telefono) {
             body: JSON.stringify({ nombre, telefono })
         });
         if (response.ok) {
-            const data = await response.json();
+            const json = await response.json();
+            const data = json.data;
             clubData = {
                 nombre: data.nombre || nombre,
                 sellos_actuales: data.sellos_actuales || 0,
@@ -847,8 +849,8 @@ function renderFidelityCard() {
     const container = document.getElementById('fidelityCardContainer');
     if (!container) return;
 
-    // Si no hay sellos, mostrar explicación
-    if (clubData.sellos_actuales === 0) {
+    // Si no tiene nombre registrado, es un cliente nuevo o no identificado
+    if (!clubData.nombre) {
         container.innerHTML = `
             <div class="fidelity-card-title">Club One More</div>
             <div class="fidelity-welcome">
@@ -860,12 +862,16 @@ function renderFidelityCard() {
                     <div>🎁 Al completar 10 sellos obtendrás una recompensa.</div>
                 </div>
             </div>
-            <button class="add-to-order" onclick="document.getElementById('fidelityModal').classList.remove('active')">
+            <button class="add-to-order close-fidelity-btn">
                 ¡Entendido!
             </button>
         `;
+
+        container.querySelector('.close-fidelity-btn').addEventListener('click', () => {
+            fidelityModal.classList.remove('active');
+        });
     } else {
-        // Si tiene sellos, mostrar tarjeta con sellos
+        // Si está identificado, mostrar tarjeta con sellos
         let stampsHtml = '';
         for (let i = 1; i <= 10; i++) {
             const isActive = i <= clubData.sellos_actuales;
@@ -876,21 +882,33 @@ function renderFidelityCard() {
             `;
         }
 
+        const hasPrize = clubData.premios_disponibles > 0;
+
         container.innerHTML = `
             <div class="fidelity-card-title">Club One More</div>
             <div class="fidelity-welcome">
                 <h4>¡Hola, ${escapeHTML(clubData.nombre)}!</h4>
-                <p>Estás cada vez más cerca de tu recompensa.</p>
+                <p>${hasPrize ? '¡Tenés un premio listo!' : 'Estás cada vez más cerca de tu recompensa.'}</p>
             </div>
+
+            ${hasPrize ? `
+            <div class="fidelity-reward-badge">
+                <span class="reward-icon">🎁</span>
+                <div class="reward-info">
+                    <strong>¡RECOMPENSA DISPONIBLE!</strong>
+                    <span>Canjeala en tu próximo pedido</span>
+                </div>
+            </div>
+            ` : ''}
 
             <div class="stamps-grid">
                 ${stampsHtml}
             </div>
 
             <div class="fidelity-status">
-                ${clubData.faltan === 0
-                    ? "¡Felicidades! Tenés una recompensa disponible 🎁"
-                    : `Te faltan ${clubData.faltan} sellos para tu premio.`}
+                ${hasPrize
+                    ? "¡Felicidades! Canjeá tu premio hoy mismo."
+                    : `Te faltan ${clubData.faltan} sellos para tu próximo premio.`}
             </div>
 
             <div class="fidelity-footer">
