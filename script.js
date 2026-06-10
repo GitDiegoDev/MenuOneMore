@@ -12,13 +12,14 @@ let initialLoadDone = false;
 
 // ========= CONFIG ==========
 const API_BASE = "https://backend-menu-production.up.railway.app/api";
-const API = API_BASE;
 
 // --- Club One More State ---
 let clubData = {
     nombre: '',
+    telefono: '',
     sellos_actuales: 0,
     premios_disponibles: 0,
+    premios_canjeados: 0,
     faltan: 10,
     is_loading: false
 };
@@ -31,11 +32,14 @@ async function fetchCustomerFidelity(phone) {
     try {
         const response = await fetch(`${API_BASE}/clientes/${phone}`);
         if (response.ok) {
-            const data = await response.json();
+            const result = await response.json();
+            const data = result.data;
             clubData = {
                 nombre: data.nombre || '',
+                telefono: data.telefono || '',
                 sellos_actuales: data.sellos_actuales ?? 0,
                 premios_disponibles: data.premios_disponibles ?? 0,
+                premios_canjeados: data.premios_canjeados ?? 0,
                 faltan: data.faltan ?? 10,
                 is_loading: false
             };
@@ -46,6 +50,45 @@ async function fetchCustomerFidelity(phone) {
         }
     } catch (error) {
         console.error("Error fetching fidelity data:", error);
+        clubData.is_loading = false;
+    } finally {
+        renderFidelityCard();
+    }
+}
+
+async function claimReward(phone) {
+    if (!phone) return;
+    if (!confirm("¿Querés canjear una recompensa ahora? Se descontará de tus premios disponibles.")) return;
+
+    clubData.is_loading = true;
+    renderFidelityCard();
+    try {
+        const response = await fetch(`${API_BASE}/clientes/reclamar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ telefono: phone })
+        });
+        if (response.ok) {
+            const result = await response.json();
+            const data = result.data;
+            clubData = {
+                nombre: data.nombre || clubData.nombre,
+                telefono: data.telefono || phone,
+                sellos_actuales: data.sellos_actuales ?? 0,
+                premios_disponibles: data.premios_disponibles ?? 0,
+                premios_canjeados: data.premios_canjeados ?? 0,
+                faltan: data.faltan ?? 10,
+                is_loading: false
+            };
+            alert("¡Recompensa canjeada con éxito! 🎉");
+        } else {
+            const error = await response.json();
+            alert(error.message || "No se pudo canjear la recompensa.");
+            clubData.is_loading = false;
+        }
+    } catch (error) {
+        console.error("Error claiming reward:", error);
+        alert("Ocurrió un error al conectar con el Club One More.");
         clubData.is_loading = false;
     } finally {
         renderFidelityCard();
@@ -63,11 +106,14 @@ async function registerOrderFidelity(nombre, telefono) {
             body: JSON.stringify({ nombre, telefono })
         });
         if (response.ok) {
-            const data = await response.json();
+            const result = await response.json();
+            const data = result.data;
             clubData = {
                 nombre: data.nombre || nombre,
+                telefono: data.telefono || telefono,
                 sellos_actuales: data.sellos_actuales ?? 0,
                 premios_disponibles: data.premios_disponibles ?? 0,
+                premios_canjeados: data.premios_canjeados ?? 0,
                 faltan: data.faltan ?? 10,
                 is_loading: false
             };
@@ -912,6 +958,9 @@ function renderFidelityCard() {
             rewardsHtml = `
                 <div class="fidelity-rewards">
                     🎁 ¡Tenés ${clubData.premios_disponibles} ${clubData.premios_disponibles === 1 ? 'recompensa disponible' : 'recompensas disponibles'}!
+                    <button class="add-to-order" onclick="claimReward('${clubData.telefono}')" style="margin-top: 10px; background: #fff; color: #25D366;">
+                        Canjear Recompensa
+                    </button>
                 </div>
             `;
         }
@@ -1032,8 +1081,11 @@ if (sendWhatsApp) {
     localStorage.setItem('clienteTelefono', customerPhone);
 
     /* ================= CLUB ONE MORE (FIDELIZACIÓN) ================= */
+    const stampsBefore = clubData.sellos_actuales;
     // Registramos el pedido para sumar sellos antes de enviar a WhatsApp
     await registerOrderFidelity(customerName, customerPhone);
+    const stampsAfter = clubData.sellos_actuales;
+    const rewardEarned = (stampsBefore > 0 && stampsAfter === 0);
 
     /* ================= GUARDAR PEDIDO ================= */
     try {
@@ -1091,6 +1143,11 @@ cart.forEach(item => {
 
 messageLines.push("--------------------------------");
 messageLines.push(`💰 *TOTAL: $${formatPrice(total)}*`);
+if (rewardEarned || clubData.premios_disponibles > 0) {
+    messageLines.push("--------------------------------");
+    messageLines.push("🎁 *¡RECOMPENSA DISPONIBLE!*");
+    messageLines.push("_Tengo un premio para canjear en este pedido_");
+}
 messageLines.push("--------------------------------");
 messageLines.push("¡Gracias por elegirnos! 😉");
 
