@@ -61,7 +61,6 @@ async function fetchCustomerFidelity(phone) {
 
 async function claimReward(phone) {
     if (!phone) return;
-    if (!confirm("¿Querés canjear una recompensa ahora? Se descontará de tus premios disponibles.")) return;
 
     clubData.is_loading = true;
     renderFidelityCard();
@@ -87,17 +86,14 @@ async function claimReward(phone) {
             // WhatsApp Message Redirection
             let messageLines = [];
             messageLines.push("🎁 *RECLAMO DE RECOMPENSA - CLUB ONE MORE*");
-            messageLines.push(`👤 *Nombre:* ${clubData.nombre}`);
-            messageLines.push(`📱 *Teléfono:* ${clubData.telefono}`);
-            messageLines.push("--------------------------------");
-            messageLines.push("El cliente tiene una recompensa disponible y solicita reclamar su premio.");
-            messageLines.push("📊 *Sellos acumulados:* 10/10");
-            messageLines.push("--------------------------------");
-            messageLines.push("¡Gracias! 😉");
+            messageLines.push(`*Nombre:* ${clubData.nombre}`);
+            messageLines.push(`*Teléfono:* ${clubData.telefono}`);
+            messageLines.push(`*Recompensas disponibles:* ${clubData.premios_disponibles}`);
+            messageLines.push("El cliente solicita canjear una recompensa disponible.");
 
             const finalMessage = encodeURIComponent(messageLines.join("\n"));
 
-            showWhatsappLoading();
+            showWhatsappLoading("Procesando recompensa");
 
             setTimeout(() => {
                 window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${finalMessage}`;
@@ -161,15 +157,9 @@ function updateFidelityButtonUI() {
     const fidelityBtn = document.getElementById('openFidelity');
     if (!fidelityBtn) return;
 
-    if (clubData.premios_disponibles > 0) {
-        fidelityBtn.innerHTML = `⭐ Club One More <br> <span style="font-size: 12px; background: #fff; color: #ff6b35; padding: 2px 8px; border-radius: 10px; margin-top: 4px; display: inline-block;">${clubData.premios_disponibles} recompensa disponible</span>`;
-        fidelityBtn.style.flexDirection = 'column';
-        fidelityBtn.style.padding = '8px 25px';
-    } else {
-        fidelityBtn.innerHTML = '🎁 Club One More';
-        fidelityBtn.style.flexDirection = 'row';
-        fidelityBtn.style.padding = '12px 25px';
-    }
+    fidelityBtn.innerHTML = '🎁 Club One More';
+    fidelityBtn.style.flexDirection = 'row';
+    fidelityBtn.style.padding = '12px 25px';
 }
 
 // Función para saber si es jueves
@@ -995,13 +985,12 @@ function renderFidelityCard() {
         }
 
         let rewardsHtml = '';
-        if (clubData.premios_disponibles > 0) {
+        if (Number(clubData.premios_disponibles) > 0) {
             rewardsHtml = `
-                <div class="fidelity-rewards" style="background: #ff6b35; border: 2px solid #fff;">
-                    <div style="font-size: 20px; margin-bottom: 5px;">🎉 ¡Felicitaciones!</div>
-                    <p style="color: #fff; margin-bottom: 10px;">Tenes una recompensa disponible para reclamar.</p>
-                    <button class="add-to-order" onclick="claimReward('${clubData.telefono}')" style="background: #fff; color: #ff6b35; font-size: 16px;">
-                        🎁 Reclamar mi recompensa
+                <div class="fidelity-rewards" style="background: #ff6b35; border: 2px solid #fff; padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+                    <div style="font-size: 18px; margin-bottom: 15px; font-weight: bold; color: #fff;">🎁 Tienes una recompensa disponible</div>
+                    <button class="add-to-order" onclick="claimReward('${clubData.telefono}')" style="background: #fff; color: #ff6b35; font-size: 16px; border: none; padding: 12px; border-radius: 25px; width: 100%; font-weight: bold; cursor: pointer;">
+                        Reclamar recompensa
                     </button>
                 </div>
             `;
@@ -1204,9 +1193,12 @@ const REFRESH_INTERVAL_MS = 60000; // 1 minuto
 
 // Mostrar loading de WhatsApp
 
-function showWhatsappLoading() {
+function showWhatsappLoading(title = "Enviando pedido") {
     const loader = document.getElementById('wa-loading');
     if (!loader) return;
+
+    const titleEl = loader.querySelector('.wa-title');
+    if (titleEl) titleEl.textContent = title;
 
     loader.style.display = 'flex';
 
