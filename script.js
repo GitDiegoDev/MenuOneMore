@@ -12,6 +12,7 @@ let initialLoadDone = false;
 
 // ========= CONFIG ==========
 const API_BASE = "https://backend-menu-production.up.railway.app/api";
+const WHATSAPP_NUMBER = "5493755415870";
 
 // --- Club One More State ---
 let clubData = {
@@ -80,7 +81,25 @@ async function claimReward(phone) {
                 faltan: data.faltan ?? 10,
                 is_loading: false
             };
-            alert("¡Recompensa canjeada con éxito! 🎉");
+            // WhatsApp Message Redirection
+            let messageLines = [];
+            messageLines.push("🎁 *CANJE DE PREMIO - CLUB ONE MORE* 🎁");
+            messageLines.push("--------------------------------");
+            messageLines.push(`👤 *Cliente:* ${clubData.nombre}`);
+            messageLines.push(`📱 *Teléfono:* ${clubData.telefono}`);
+            messageLines.push("--------------------------------");
+            messageLines.push("¡Hola! He completado mis 10 sellos y vengo a canjear mi recompensa. 🎉");
+            messageLines.push("--------------------------------");
+            messageLines.push("¡Gracias! 😉");
+
+            const finalMessage = encodeURIComponent(messageLines.join("\n"));
+
+            showWhatsappLoading();
+
+            setTimeout(() => {
+                window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${finalMessage}`;
+            }, 600);
+
         } else {
             const error = await response.json();
             alert(error.message || "No se pudo canjear la recompensa.");
@@ -1151,13 +1170,12 @@ if (rewardEarned || clubData.premios_disponibles > 0) {
 messageLines.push("--------------------------------");
 messageLines.push("¡Gracias por elegirnos! 😉");
 
-const phone = "5493755415870";
 const finalMessage = encodeURIComponent(messageLines.join("\n"));
 
 showWhatsappLoading();
 
 setTimeout(() => {
-window.location.href = `https://wa.me/${phone}?text=${finalMessage}`;
+window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${finalMessage}`;
 }, 600);
 
 /* ================= LIMPIAR ================= */
