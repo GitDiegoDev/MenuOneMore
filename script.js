@@ -30,6 +30,7 @@ async function fetchCustomerFidelity(phone) {
     if (!phone) return;
     clubData.is_loading = true;
     renderFidelityCard();
+    updateFidelityButtonUI();
     try {
         const response = await fetch(`${API_BASE}/clientes/${phone}`);
         if (response.ok) {
@@ -54,6 +55,7 @@ async function fetchCustomerFidelity(phone) {
         clubData.is_loading = false;
     } finally {
         renderFidelityCard();
+    updateFidelityButtonUI();
     }
 }
 
@@ -63,6 +65,7 @@ async function claimReward(phone) {
 
     clubData.is_loading = true;
     renderFidelityCard();
+    updateFidelityButtonUI();
     try {
         const response = await fetch(`${API_BASE}/clientes/reclamar`, {
             method: 'POST',
@@ -83,12 +86,12 @@ async function claimReward(phone) {
             };
             // WhatsApp Message Redirection
             let messageLines = [];
-            messageLines.push("🎁 *CANJE DE PREMIO - CLUB ONE MORE* 🎁");
-            messageLines.push("--------------------------------");
-            messageLines.push(`👤 *Cliente:* ${clubData.nombre}`);
+            messageLines.push("🎁 *RECLAMO DE RECOMPENSA - CLUB ONE MORE*");
+            messageLines.push(`👤 *Nombre:* ${clubData.nombre}`);
             messageLines.push(`📱 *Teléfono:* ${clubData.telefono}`);
             messageLines.push("--------------------------------");
-            messageLines.push("¡Hola! He completado mis 10 sellos y vengo a canjear mi recompensa. 🎉");
+            messageLines.push("El cliente tiene una recompensa disponible y solicita reclamar su premio.");
+            messageLines.push("📊 *Sellos acumulados:* 10/10");
             messageLines.push("--------------------------------");
             messageLines.push("¡Gracias! 😉");
 
@@ -111,6 +114,7 @@ async function claimReward(phone) {
         clubData.is_loading = false;
     } finally {
         renderFidelityCard();
+    updateFidelityButtonUI();
     }
 }
 
@@ -118,6 +122,7 @@ async function registerOrderFidelity(nombre, telefono) {
     if (!nombre || !telefono) return;
     clubData.is_loading = true;
     renderFidelityCard();
+    updateFidelityButtonUI();
     try {
         const response = await fetch(`${API_BASE}/clientes/pedido`, {
             method: 'POST',
@@ -148,6 +153,22 @@ async function registerOrderFidelity(nombre, telefono) {
         clubData.is_loading = false;
     } finally {
         renderFidelityCard();
+    updateFidelityButtonUI();
+    }
+}
+
+function updateFidelityButtonUI() {
+    const fidelityBtn = document.getElementById('openFidelity');
+    if (!fidelityBtn) return;
+
+    if (clubData.premios_disponibles > 0) {
+        fidelityBtn.innerHTML = `⭐ Club One More <br> <span style="font-size: 12px; background: #fff; color: #ff6b35; padding: 2px 8px; border-radius: 10px; margin-top: 4px; display: inline-block;">${clubData.premios_disponibles} recompensa disponible</span>`;
+        fidelityBtn.style.flexDirection = 'column';
+        fidelityBtn.style.padding = '8px 25px';
+    } else {
+        fidelityBtn.innerHTML = '🎁 Club One More';
+        fidelityBtn.style.flexDirection = 'row';
+        fidelityBtn.style.padding = '12px 25px';
     }
 }
 
@@ -918,6 +939,7 @@ if (openFidelityBtn) {
             fetchCustomerFidelity(phone);
         } else {
             renderFidelityCard();
+    updateFidelityButtonUI();
         }
     });
 }
@@ -975,10 +997,11 @@ function renderFidelityCard() {
         let rewardsHtml = '';
         if (clubData.premios_disponibles > 0) {
             rewardsHtml = `
-                <div class="fidelity-rewards">
-                    🎁 ¡Tenés ${clubData.premios_disponibles} ${clubData.premios_disponibles === 1 ? 'recompensa disponible' : 'recompensas disponibles'}!
-                    <button class="add-to-order" onclick="claimReward('${clubData.telefono}')" style="margin-top: 10px; background: #fff; color: #25D366;">
-                        Canjear Recompensa
+                <div class="fidelity-rewards" style="background: #ff6b35; border: 2px solid #fff;">
+                    <div style="font-size: 20px; margin-bottom: 5px;">🎉 ¡Felicitaciones!</div>
+                    <p style="color: #fff; margin-bottom: 10px;">Tenes una recompensa disponible para reclamar.</p>
+                    <button class="add-to-order" onclick="claimReward('${clubData.telefono}')" style="background: #fff; color: #ff6b35; font-size: 16px;">
+                        🎁 Reclamar mi recompensa
                     </button>
                 </div>
             `;
@@ -1100,11 +1123,8 @@ if (sendWhatsApp) {
     localStorage.setItem('clienteTelefono', customerPhone);
 
     /* ================= CLUB ONE MORE (FIDELIZACIÓN) ================= */
-    const stampsBefore = clubData.sellos_actuales;
     // Registramos el pedido para sumar sellos antes de enviar a WhatsApp
     await registerOrderFidelity(customerName, customerPhone);
-    const stampsAfter = clubData.sellos_actuales;
-    const rewardEarned = (stampsBefore > 0 && stampsAfter === 0);
 
     /* ================= GUARDAR PEDIDO ================= */
     try {
@@ -1162,11 +1182,6 @@ cart.forEach(item => {
 
 messageLines.push("--------------------------------");
 messageLines.push(`💰 *TOTAL: $${formatPrice(total)}*`);
-if (rewardEarned || clubData.premios_disponibles > 0) {
-    messageLines.push("--------------------------------");
-    messageLines.push("🎁 *¡RECOMPENSA DISPONIBLE!*");
-    messageLines.push("_Tengo un premio para canjear en este pedido_");
-}
 messageLines.push("--------------------------------");
 messageLines.push("¡Gracias por elegirnos! 😉");
 
