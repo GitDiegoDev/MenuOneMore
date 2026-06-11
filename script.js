@@ -930,17 +930,34 @@ function renderFidelityCard() {
             <div class="fidelity-card-title">Club One More</div>
             <div class="fidelity-welcome">
                 <h4>¡Empieza a acumular recompensas!</h4>
-                <p>Realiza tu primer pedido para unirte al programa de fidelización.</p>
+                <p>Ingresá tu teléfono para ver tus sellos o realizá tu primer pedido para unirte.</p>
+
+                <div class="form-group" style="margin-top: 20px;">
+                    <input type="tel" id="fidelityPhoneLookup" placeholder="Tu número de teléfono" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ff6b35; background: rgba(255,255,255,0.1); color: white;">
+                    <button class="add-to-order" id="lookupFidelityBtn" style="margin-top: 10px;">
+                        Consultar mis sellos
+                    </button>
+                </div>
 
                 <div class="fidelity-explanation">
                     <div>🎁 Cada compra suma 1 sello.</div>
                     <div>🎁 Al completar 10 sellos obtendrás una recompensa.</div>
                 </div>
             </div>
-            <button class="add-to-order" onclick="document.getElementById('fidelityModal').classList.remove('active')">
-                ¡Entendido!
-            </button>
         `;
+
+        const lookupBtn = container.querySelector('#lookupFidelityBtn');
+        const phoneInput = container.querySelector('#fidelityPhoneLookup');
+        if (lookupBtn && phoneInput) {
+            lookupBtn.addEventListener('click', () => {
+                const phone = phoneInput.value.trim();
+                if (phone) {
+                    fetchCustomerFidelity(phone);
+                } else {
+                    alert("Por favor ingresá tu número de teléfono");
+                }
+            });
+        }
     } else {
         // Si tiene nombre, mostrar tarjeta con sellos y datos reales
         let stampsHtml = '';
@@ -956,9 +973,9 @@ function renderFidelityCard() {
         let rewardsHtml = '';
         if (clubData.premios_disponibles > 0) {
             rewardsHtml = `
-                <div class="fidelity-rewards">
+                <div class="fidelity-rewards" style="background: #ff6b35; color: white;">
                     🎁 ¡Tenés ${clubData.premios_disponibles} ${clubData.premios_disponibles === 1 ? 'recompensa disponible' : 'recompensas disponibles'}!
-                    <button class="add-to-order" onclick="claimReward('${clubData.telefono}')" style="margin-top: 10px; background: #fff; color: #25D366;">
+                    <button class="add-to-order" onclick="claimReward('${clubData.telefono}')" style="margin-top: 10px; background: #fff; color: #ff6b35; border: 2px solid #fff; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
                         Canjear Recompensa
                     </button>
                 </div>
