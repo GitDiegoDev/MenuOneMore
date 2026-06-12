@@ -114,7 +114,7 @@ async function claimReward(phone) {
     }
 }
 
-async function registerOrderFidelity(nombre, telefono) {
+async function registerOrderFidelity(nombre, telefono, pedidoUuid) {
     if (!nombre || !telefono) return;
     clubData.is_loading = true;
     renderFidelityCard();
@@ -123,7 +123,7 @@ async function registerOrderFidelity(nombre, telefono) {
         const response = await fetch(`${API_BASE}/clientes/pedido`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre, telefono })
+            body: JSON.stringify({ nombre, telefono, pedido_uuid: pedidoUuid })
         });
         if (response.ok) {
             const result = await response.json();
@@ -1102,6 +1102,12 @@ if (sendWhatsApp) {
         return;
     }
 
+    // --- IDEMPOTENCIA Y BLOQUEO ---
+    const originalHTML = sendWhatsApp.innerHTML;
+    sendWhatsApp.disabled = true;
+    sendWhatsApp.innerHTML = "Procesando pedido...";
+    const pedidoUuid = crypto.randomUUID();
+
     const total = cart.reduce((acc, i) => acc + (i.price * i.quantity), 0);
 
     /* ================= PERSISTENCIA LOCAL ================= */
@@ -1111,16 +1117,17 @@ if (sendWhatsApp) {
     localStorage.setItem('clienteNombre', customerName);
     localStorage.setItem('clienteTelefono', customerPhone);
 
-    /* ================= CLUB ONE MORE (FIDELIZACIÓN) ================= */
-    // Registramos el pedido para sumar sellos antes de enviar a WhatsApp
-    await registerOrderFidelity(customerName, customerPhone);
-
-    /* ================= GUARDAR PEDIDO ================= */
     try {
+        /* ================= CLUB ONE MORE (FIDELIZACIÓN) ================= */
+        // Registramos el pedido para sumar sellos antes de enviar a WhatsApp
+        await registerOrderFidelity(customerName, customerPhone, pedidoUuid);
+
+        /* ================= GUARDAR PEDIDO ================= */
         const response = await fetch(`${API_BASE}/orders`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                pedido_uuid: pedidoUuid,
                 customer_name: customerName,
                 payment_method: paymentMethod,
                 items: cart,
@@ -1134,15 +1141,8 @@ if (sendWhatsApp) {
             throw new Error('No se pudo guardar el pedido');
         }
 
-    } catch (error) {
-        console.error(error);
-        alert("Error al guardar el pedido. Intentalo nuevamente.");
-        return;
-    }
-
-     /* ================= WHATSAPP ================= */
-
-let messageLines = [];
+        /* ================= WHATSAPP ================= */
+        let messageLines = [];
 messageLines.push("🍔 *NUEVO PEDIDO - ONE MORE* 🍔");
 messageLines.push("--------------------------------");
 messageLines.push(`👤 *Cliente:* ${customerName}`);
@@ -1186,6 +1186,14 @@ window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${finalMessage}`;
 cart = [];
 updateCart();
 cartModal.classList.remove('active');
+
+    } catch (error) {
+        console.error(error);
+        alert("Error al guardar el pedido o conectar con el Club. Intentalo nuevamente.");
+        // Volver a habilitar el botón en caso de error
+        sendWhatsApp.disabled = false;
+        sendWhatsApp.innerHTML = originalHTML;
+    }
     });
 
 }
