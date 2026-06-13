@@ -960,12 +960,12 @@ function renderFidelityCard() {
         container.innerHTML = `
             <div class="fidelity-card-title">Club One More</div>
             <div class="fidelity-welcome">
-                <h4>¡Empieza a acumular recompensas!</h4>
-                <p>Realiza tu primer pedido para unirte al programa de fidelización.</p>
+                <h4>En One More valoramos a nuestros clientes de siempre!</h4>
+                <p>Por eso, cada compra te acerca a una recompensa!</p>
 
                 <div class="fidelity-explanation">
-                    <div>🎁 Cada compra suma 1 sello.</div>
-                    <div>🎁 Al completar 10 sellos obtendrás una recompensa.</div>
+                    <div>🎁 Sumá 1 sello con cada pedido.</div>
+                    <div>🎁 Completá 10 sellos y ganate un premio.</div>
                 </div>
             </div>
             <button class="add-to-order" onclick="document.getElementById('fidelityModal').classList.remove('active')">
