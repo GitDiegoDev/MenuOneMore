@@ -678,14 +678,71 @@ body {
     animation: fadeIn 0.3s ease;
 }
 
+.cart-modal-container {
+    position: relative;
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
+    overflow: hidden; /* Back to hidden to keep it neat */
+    border-radius: 20px;
+}
+
 .cart-content {
     background: #fff;
     border-radius: 20px;
     padding: 30px;
-    max-width: 500px;
     width: 100%;
     max-height: 80vh;
     overflow-y: auto;
+    overflow-x: hidden; /* Keep content contained horizontally */
+    position: relative;
+}
+
+/* Diagonal Ribbon */
+.cart-ribbon {
+    position: absolute;
+    top: 18px;
+    right: -58px;
+    background: #ff6b35;
+    color: #fff;
+    padding: 10px 0;
+    transform: rotate(45deg);
+    z-index: 2001;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    pointer-events: none;
+    width: 250px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.ribbon-main {
+    font-weight: 800;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.ribbon-sub {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.ribbon-detail {
+    font-size: 10px;
+    opacity: 0.9;
+}
+
+@media (max-width: 480px) {
+    .cart-ribbon {
+        top: 15px;
+        right: -65px;
+        width: 220px;
+    }
+    .ribbon-main { font-size: 11px; }
+    .ribbon-sub { font-size: 9px; }
+    .ribbon-detail { font-size: 8px; }
 }
 
 .cart-header {
@@ -707,6 +764,8 @@ body {
     font-size: 30px;
     cursor: pointer;
     color: #666;
+    z-index: 2002; /* Higher than ribbon */
+    position: relative;
 }
 
 .cart-item {
