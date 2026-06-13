@@ -702,11 +702,11 @@ body {
 .cart-ribbon {
     position: absolute;
     top: 18px;
-    right: -58px;
+    left: -58px;
     background: #ff6b35;
     color: #fff;
     padding: 10px 0;
-    transform: rotate(45deg);
+    transform: rotate(-45deg);
     z-index: 2001;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     display: flex;
@@ -737,7 +737,7 @@ body {
 @media (max-width: 480px) {
     .cart-ribbon {
         top: 15px;
-        right: -65px;
+        left: -65px;
         width: 220px;
     }
     .ribbon-main { font-size: 11px; }
@@ -756,6 +756,8 @@ body {
 
 .cart-header h2 {
     font-size: 24px;
+    flex: 1;
+    text-align: center;
 }
 
 .close-cart {
