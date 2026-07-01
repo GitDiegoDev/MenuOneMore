@@ -459,7 +459,7 @@ async function fetchAndRenderProducts() {
         document.querySelectorAll('.menu-section').forEach(section => {
             section.innerHTML = '';
         });
-        products.forEach(p => {
+        products.forEach((p, index) => {
             const container = document.getElementById(`cat-${p.category_id}`);
             if (!container) return;
 
@@ -476,6 +476,11 @@ async function fetchAndRenderProducts() {
             div.dataset.id = p.id;
             div.dataset.item = p.name;
             div.dataset.price = price;
+
+            // Apply staggered animation delay if theme is active
+            if (document.body.classList.contains('wc-theme')) {
+                div.style.animationDelay = `${(index % 10) * 0.1}s`;
+            }
 
             div.innerHTML = `
                 <div class="click-indicator"></div>
