@@ -1,8 +1,8 @@
 :root {
     --wc-celeste: #74C9FF;
     --wc-celeste-light: #E3F2FD;
-    --wc-celeste-dark: #0056b3;
-    --wc-dark-blue: #003366; /* More of a dark celeste now */
+    --wc-celeste-dark: #00458b;
+    --wc-dark-blue: #0B2D5C; /* AFA Dark Blue */
     --wc-gold: #D4AF37;
     --wc-white: #ffffff;
     --wc-text: #1a1a1a;
@@ -145,16 +145,29 @@ body.wc-theme .tab.active {
 
 .wc-promo-banner .wc-trophy-bg {
     position: absolute;
-    right: -10px;
-    bottom: -20px;
-    font-size: 150px;
-    opacity: 0.2;
-    transform: rotate(-10deg);
+    right: 10px;
+    bottom: -10px;
+    width: 120px;
+    height: 180px;
+    opacity: 0.7;
+    transform: rotate(-5deg);
     pointer-events: none;
+    z-index: 1;
 }
 
-.wc-promo-banner svg path {
-    fill: #ffffff !important;
+.wc-promo-banner svg {
+    filter: drop-shadow(0 0 10px rgba(0,0,0,0.2));
+}
+
+.wc-promo-banner svg path,
+.wc-promo-banner svg circle,
+.wc-promo-banner svg rect {
+    fill: var(--wc-gold) !important;
+}
+
+.wc-promo-banner h2, .wc-promo-banner p {
+    position: relative;
+    z-index: 2;
 }
 
 /* Menu Items */
@@ -169,10 +182,10 @@ body.wc-theme .menu-item:hover {
 }
 
 body.wc-theme .item-price {
-    background: var(--wc-celeste);
+    background: var(--wc-dark-blue);
     color: #ffffff;
-    font-weight: bold;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    font-weight: 800;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 body.wc-theme .menu-item:hover .item-price {
@@ -181,10 +194,10 @@ body.wc-theme .menu-item:hover .item-price {
 
 /* Buttons */
 body.wc-theme .add-to-order {
-    background: var(--wc-celeste);
+    background: var(--wc-dark-blue);
     color: #ffffff;
     font-weight: bold;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 body.wc-theme .add-to-order:hover {
@@ -194,12 +207,12 @@ body.wc-theme .add-to-order:hover {
 
 /* Fidelity Button */
 body.wc-theme .fidelity-btn {
-    background: var(--wc-celeste) !important;
+    background: var(--wc-dark-blue) !important;
     border: 2px solid var(--wc-gold) !important;
     color: #ffffff !important;
-    box-shadow: 0 4px 15px rgba(116, 201, 255, 0.4) !important;
-    font-weight: bold !important;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
+    box-shadow: 0 4px 15px rgba(11, 45, 92, 0.4) !important;
+    font-weight: 800 !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
 }
 
 /* Cart Ribbon */
@@ -218,11 +231,19 @@ body.wc-theme .fidelity-modal.active {
 body.wc-theme .fidelity-content {
     background: linear-gradient(135deg, var(--wc-celeste) 0%, #ffffff 100%) !important;
     border: 2px solid var(--wc-gold) !important;
-    color: var(--wc-text) !important;
+    color: var(--wc-dark-blue) !important;
+}
+
+body.wc-theme .fidelity-content h4,
+body.wc-theme .fidelity-content p,
+body.wc-theme .fidelity-content span:not(.stamp),
+body.wc-theme .fidelity-content div:not(.stamp) {
+    color: var(--wc-dark-blue) !important;
 }
 
 body.wc-theme .fidelity-card-title {
-    color: var(--wc-celeste-dark) !important;
+    color: var(--wc-dark-blue) !important;
+    font-weight: 900 !important;
 }
 
 body.wc-theme .stamp.active {
@@ -232,8 +253,8 @@ body.wc-theme .stamp.active {
 }
 
 body.wc-theme .fidelity-status {
-    color: var(--wc-celeste-dark) !important;
-    font-weight: bold !important;
+    color: var(--wc-dark-blue) !important;
+    font-weight: 800 !important;
 }
 
 /* Reward Claim Button */
@@ -243,11 +264,12 @@ body.wc-theme .fidelity-rewards {
 }
 
 body.wc-theme .fidelity-rewards .reward-info h4 {
-    color: var(--wc-celeste-dark) !important;
+    color: var(--wc-dark-blue) !important;
+    font-weight: 800 !important;
 }
 
 body.wc-theme .fidelity-rewards button.add-to-order {
-    background: var(--wc-celeste) !important;
+    background: var(--wc-dark-blue) !important;
     color: #ffffff !important;
 }
 
