@@ -9,59 +9,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("World Cup 2026 Theme Active 🇦🇷⚽");
 
-    // 1. Agregar decoraciones flotantes
-    initWcDecorations();
-
-    // 2. Manejar iconos temáticos en el header (si existen contenedores)
+    // 1. Manejar iconos temáticos en el header (si existen contenedores)
     addHeaderDecorations();
 
     // 3. Inyectar banner del mundial
     injectWcBanner();
 });
 
-function initWcDecorations() {
-    const emojis = ['⚽', '⭐', '🇦🇷', '🏆'];
-    const decorationCount = 8;
-
-    for (let i = 0; i < decorationCount; i++) {
-        const deco = document.createElement('div');
-        deco.className = 'wc-decoration';
-        deco.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-
-        // Posición aleatoria
-        deco.style.left = Math.random() * 90 + 'vw';
-        deco.style.top = Math.random() * 90 + 'vh';
-
-        // Retraso de animación aleatorio
-        deco.style.animationDelay = Math.random() * 5 + 's';
-
-        document.body.appendChild(deco);
-    }
-}
-
 function addHeaderDecorations() {
     const header = document.querySelector('.header');
     if (!header) return;
 
-    // 1. Estrellas arriba del logo
+    // 1. Estrellas arriba del logo + bandera discreta
     const logoImg = header.querySelector('.logo-img');
     if (logoImg && !header.querySelector('.wc-stars-container')) {
         const starsContainer = document.createElement('div');
         starsContainer.className = 'wc-stars-container';
-        starsContainer.innerHTML = '⭐ ⭐ ⭐';
+        starsContainer.innerHTML = '⭐ ⭐ ⭐ <span style="font-size: 16px; vertical-align: middle; margin-left: 8px;">🇦🇷</span>';
         starsContainer.style.textAlign = 'center';
         starsContainer.style.fontSize = '24px';
         starsContainer.style.marginBottom = '5px';
         logoImg.parentNode.insertBefore(starsContainer, logoImg);
     }
 
-    // 2. Pelota al lado de Resto Bar
-    const tagline = header.querySelector('.tagline');
-    if (tagline && !tagline.querySelector('.wc-ball-icon')) {
-        const ball = document.createElement('span');
-        ball.className = 'wc-ball-icon';
-        ball.innerHTML = ' ⚽';
-        tagline.append(ball);
+    // 2. Una sola pelota en la parte superior, discreta
+    if (!header.querySelector('.wc-header-ball')) {
+        const ball = document.createElement('div');
+        ball.className = 'wc-header-ball';
+        ball.innerHTML = '⚽';
+        ball.style.position = 'absolute';
+        ball.style.top = '40px';
+        ball.style.right = '20px';
+        ball.style.fontSize = '20px';
+        ball.style.opacity = '0.5';
+        header.appendChild(ball);
     }
 }
 
