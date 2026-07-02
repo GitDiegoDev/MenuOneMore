@@ -1,12 +1,15 @@
 :root {
     --wc-celeste: #74C9FF;
-    --wc-dark-blue: #0B2D5C;
+    --wc-celeste-light: #E3F2FD;
+    --wc-celeste-dark: #0056b3;
+    --wc-dark-blue: #003366; /* More of a dark celeste now */
     --wc-gold: #D4AF37;
     --wc-white: #ffffff;
+    --wc-text: #1a1a1a;
 }
 
 body.wc-theme {
-    background: linear-gradient(135deg, var(--wc-dark-blue) 0%, #1a1a1a 100%);
+    background: linear-gradient(135deg, var(--wc-celeste) 0%, #f0f8ff 100%);
     background-attachment: fixed;
     position: relative;
     overflow-x: hidden;
@@ -19,7 +22,7 @@ body.wc-theme::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2374c9ff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2374c9ff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     z-index: -1;
 }
 
@@ -27,14 +30,14 @@ body.wc-theme::before {
 body.wc-theme .header,
 body.wc-theme .menu-section,
 body.wc-theme .footer,
-body.wc-theme .cart-content,
-body.wc-theme .fidelity-content {
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+body.wc-theme .cart-content {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(116, 201, 255, 0.3);
+    backdrop-filter: blur(5px);
 }
 
 body.wc-theme .footer {
-    color: #333;
+    color: var(--wc-text);
 }
 
 body.wc-theme .footer p,
@@ -42,13 +45,13 @@ body.wc-theme .footer .social-link,
 body.wc-theme .footer a,
 body.wc-theme .developer-credit,
 body.wc-theme .developer-credit a {
-    color: #333;
+    color: var(--wc-text);
 }
 
 body.wc-theme .footer a:hover,
 body.wc-theme .footer .social-link:hover,
 body.wc-theme .developer-credit a:hover {
-    color: var(--wc-dark-blue);
+    color: var(--wc-celeste-dark);
 }
 
 body.wc-theme .header {
@@ -76,7 +79,7 @@ body.wc-theme .header::after {
 }
 
 body.wc-theme .tagline {
-    color: var(--wc-dark-blue);
+    color: var(--wc-celeste-dark);
     font-weight: bold;
     display: flex;
     align-items: center;
@@ -84,55 +87,45 @@ body.wc-theme .tagline {
     gap: 8px;
 }
 
-body.wc-theme .order-instruction {
-    background: #e0e0e0 !important;
-    color: #666 !important;
-    box-shadow: none !important;
-    border: 1px solid #d0d0d0 !important;
-}
-
-body.wc-theme .site-hours-pill {
-    background: #fff !important;
-    border: 1px solid #eee !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
-}
-
-/* Tabs - Opaque */
+/* Tabs / Categorías - Now Celeste background as requested */
 body.wc-theme .tabs-wrapper {
-    background: #ffffff;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+    background: var(--wc-celeste-light);
+    border-bottom: 2px solid var(--wc-celeste);
 }
 
 body.wc-theme .tabs {
-    background: #ffffff;
+    background: transparent;
 }
 
 body.wc-theme .tab {
-    background: #f0f0f0;
-    color: #777;
+    background: #ffffff;
+    color: var(--wc-celeste-dark);
     border-radius: 30px;
-    border: 1px solid #eee;
+    border: 1px solid var(--wc-celeste);
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 body.wc-theme .tab.active {
-    background: var(--wc-dark-blue);
-    color: #fff;
+    background: var(--wc-celeste);
+    color: #ffffff;
     border-color: var(--wc-gold);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 /* World Cup Promo Banner */
 .wc-promo-banner {
-    background: var(--wc-dark-blue);
-    color: #fff;
+    background: var(--wc-celeste);
+    color: #ffffff;
     padding: 35px 25px;
     border-radius: 20px;
     text-align: left;
     margin: 20px 10px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(11, 45, 92, 0.3);
+    box-shadow: 0 10px 30px rgba(116, 201, 255, 0.4);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .wc-promo-banner h2 {
@@ -146,8 +139,8 @@ body.wc-theme .tab.active {
 
 .wc-promo-banner p {
     font-size: 18px;
-    font-weight: 500;
-    color: #fff;
+    font-weight: 600;
+    color: #ffffff;
 }
 
 .wc-promo-banner .wc-trophy-bg {
@@ -158,6 +151,10 @@ body.wc-theme .tab.active {
     opacity: 0.2;
     transform: rotate(-10deg);
     pointer-events: none;
+}
+
+.wc-promo-banner svg path {
+    fill: #ffffff !important;
 }
 
 /* Menu Items */
@@ -172,7 +169,10 @@ body.wc-theme .menu-item:hover {
 }
 
 body.wc-theme .item-price {
-    background: var(--wc-dark-blue);
+    background: var(--wc-celeste);
+    color: #ffffff;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 body.wc-theme .menu-item:hover .item-price {
@@ -181,27 +181,33 @@ body.wc-theme .menu-item:hover .item-price {
 
 /* Buttons */
 body.wc-theme .add-to-order {
-    background: var(--wc-dark-blue);
+    background: var(--wc-celeste);
+    color: #ffffff;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 body.wc-theme .add-to-order:hover {
-    background: var(--wc-celeste);
-    color: var(--wc-dark-blue);
+    background: var(--wc-gold);
+    color: #ffffff;
 }
 
 /* Fidelity Button */
 body.wc-theme .fidelity-btn {
-    background: var(--wc-dark-blue) !important;
+    background: var(--wc-celeste) !important;
     border: 2px solid var(--wc-gold) !important;
-    color: var(--wc-gold) !important;
-    box-shadow: 0 4px 15px rgba(11, 45, 92, 0.4) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(116, 201, 255, 0.4) !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
 }
 
 /* Cart Ribbon */
 body.wc-theme .cart-ribbon {
     background: var(--wc-gold) !important;
-    color: var(--wc-dark-blue) !important;
-    border: 1px solid var(--wc-dark-blue) !important;
+    color: #ffffff !important;
+    border: 1px solid var(--wc-celeste) !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
 }
 
 /* Fidelity Modal */
@@ -210,12 +216,13 @@ body.wc-theme .fidelity-modal.active {
 }
 
 body.wc-theme .fidelity-content {
-    background: linear-gradient(135deg, var(--wc-dark-blue) 0%, #1a1a1a 100%) !important;
+    background: linear-gradient(135deg, var(--wc-celeste) 0%, #ffffff 100%) !important;
     border: 2px solid var(--wc-gold) !important;
+    color: var(--wc-text) !important;
 }
 
 body.wc-theme .fidelity-card-title {
-    color: var(--wc-celeste) !important;
+    color: var(--wc-celeste-dark) !important;
 }
 
 body.wc-theme .stamp.active {
@@ -225,18 +232,23 @@ body.wc-theme .stamp.active {
 }
 
 body.wc-theme .fidelity-status {
-    color: var(--wc-gold) !important;
+    color: var(--wc-celeste-dark) !important;
+    font-weight: bold !important;
 }
 
 /* Reward Claim Button */
 body.wc-theme .fidelity-rewards {
-    background: var(--wc-dark-blue) !important;
-    border: 2px solid var(--wc-gold) !important;
+    background: var(--wc-celeste-light) !important;
+    border: 2px solid var(--wc-celeste) !important;
+}
+
+body.wc-theme .fidelity-rewards .reward-info h4 {
+    color: var(--wc-celeste-dark) !important;
 }
 
 body.wc-theme .fidelity-rewards button.add-to-order {
-    background: var(--wc-white) !important;
-    color: var(--wc-dark-blue) !important;
+    background: var(--wc-celeste) !important;
+    color: #ffffff !important;
 }
 
 
