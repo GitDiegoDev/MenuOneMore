@@ -33,6 +33,24 @@ body.wc-theme .fidelity-content {
     border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+body.wc-theme .footer {
+    color: #333;
+}
+
+body.wc-theme .footer p,
+body.wc-theme .footer .social-link,
+body.wc-theme .footer a,
+body.wc-theme .developer-credit,
+body.wc-theme .developer-credit a {
+    color: #333;
+}
+
+body.wc-theme .footer a:hover,
+body.wc-theme .footer .social-link:hover,
+body.wc-theme .developer-credit a:hover {
+    color: var(--wc-dark-blue);
+}
+
 body.wc-theme .header {
     border-bottom: none;
     position: relative;
