@@ -36,28 +36,110 @@ body.wc-theme .fidelity-content {
 }
 
 body.wc-theme .header {
-    border-bottom: 4px solid var(--wc-celeste);
+    border-bottom: none;
+    position: relative;
+    padding-top: 40px;
+}
+
+body.wc-theme .header::before,
+body.wc-theme .header::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background: var(--wc-celeste);
+}
+
+body.wc-theme .header::before {
+    top: 0;
+}
+
+body.wc-theme .header::after {
+    top: 15px;
 }
 
 body.wc-theme .tagline {
     color: var(--wc-dark-blue);
     font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+body.wc-theme .order-instruction {
+    background: #e0e0e0 !important;
+    color: #666 !important;
+    box-shadow: none !important;
+    border: 1px solid #d0d0d0 !important;
+}
+
+body.wc-theme .site-hours-pill {
+    background: #fff !important;
+    border: 1px solid #eee !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
 }
 
 /* Tabs */
 body.wc-theme .tabs-wrapper {
-    background: var(--wc-dark-blue);
+    background: transparent;
+}
+
+body.wc-theme .tabs {
+    background: transparent;
 }
 
 body.wc-theme .tab {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--wc-celeste);
+    background: #f0f0f0;
+    color: #777;
+    border-radius: 30px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 body.wc-theme .tab.active {
-    background: var(--wc-celeste);
-    color: var(--wc-dark-blue);
-    box-shadow: 0 4px 15px rgba(116, 201, 255, 0.4);
+    background: #888;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* World Cup Promo Banner */
+.wc-promo-banner {
+    background: var(--wc-dark-blue);
+    color: #fff;
+    padding: 35px 25px;
+    border-radius: 20px;
+    text-align: left;
+    margin: 20px 10px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(11, 45, 92, 0.3);
+}
+
+.wc-promo-banner h2 {
+    font-size: 28px;
+    font-weight: 900;
+    margin-bottom: 8px;
+    line-height: 1.1;
+    max-width: 80%;
+    text-transform: uppercase;
+}
+
+.wc-promo-banner p {
+    font-size: 18px;
+    font-weight: 500;
+    color: #fff;
+}
+
+.wc-promo-banner .wc-trophy-bg {
+    position: absolute;
+    right: -10px;
+    bottom: -20px;
+    font-size: 150px;
+    opacity: 0.2;
+    transform: rotate(-10deg);
+    pointer-events: none;
 }
 
 /* Menu Items */

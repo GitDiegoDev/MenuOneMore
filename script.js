@@ -477,7 +477,8 @@ async function fetchAndRenderProducts() {
             // Lógica temática: animaciones escalonadas
             if (document.body.classList.contains('wc-theme')) {
                 itemClass += ' wc-animate';
-                div.style.animationDelay = `${index * 0.05}s`;
+                // Usamos modulo para que la animación no se retrase demasiado en listas largas
+                div.style.animationDelay = `${(index % 15) * 0.05}s`;
             }
 
             div.className = itemClass;
