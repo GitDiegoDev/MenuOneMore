@@ -143,26 +143,24 @@ body.wc-theme .tab.active {
     color: #ffffff;
 }
 
-.wc-promo-banner .wc-trophy-bg {
+.wc-promo-banner .wc-banner-decor {
     position: absolute;
-    right: 10px;
-    bottom: -10px;
-    width: 120px;
-    height: 180px;
-    opacity: 0.7;
-    transform: rotate(-5deg);
-    pointer-events: none;
+    right: 20px;
+    bottom: 10px;
+    text-align: center;
     z-index: 1;
+    pointer-events: none;
 }
 
-.wc-promo-banner svg {
-    filter: drop-shadow(0 0 10px rgba(0,0,0,0.2));
+.wc-banner-stars {
+    font-size: 40px;
+    margin-bottom: 5px;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
 }
 
-.wc-promo-banner svg path,
-.wc-promo-banner svg circle,
-.wc-promo-banner svg rect {
-    fill: var(--wc-gold) !important;
+.wc-banner-flag {
+    font-size: 60px;
+    line-height: 1;
 }
 
 .wc-promo-banner h2, .wc-promo-banner p {
