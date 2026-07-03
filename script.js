@@ -459,7 +459,7 @@ async function fetchAndRenderProducts() {
         document.querySelectorAll('.menu-section').forEach(section => {
             section.innerHTML = '';
         });
-        products.forEach(p => {
+        products.forEach((p, index) => {
             const container = document.getElementById(`cat-${p.category_id}`);
             if (!container) return;
 
@@ -472,7 +472,16 @@ async function fetchAndRenderProducts() {
                     : '';
 
             const div = document.createElement('div');
-            div.className = 'menu-item' + (isNew ? ' new-product-highlight destacado' : '');
+            let itemClass = 'menu-item' + (isNew ? ' new-product-highlight destacado' : '');
+
+            // Lógica temática: animaciones escalonadas
+            if (document.body.classList.contains('wc-theme')) {
+                itemClass += ' wc-animate';
+                // Usamos modulo para que la animación no se retrase demasiado en listas largas
+                div.style.animationDelay = `${(index % 15) * 0.05}s`;
+            }
+
+            div.className = itemClass;
             div.dataset.id = p.id;
             div.dataset.item = p.name;
             div.dataset.price = price;
