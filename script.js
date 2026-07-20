@@ -479,6 +479,11 @@ async function fetchAndRenderProducts() {
             div.dataset.item = p.name;
             div.dataset.price = price;
 
+            // Apply staggered animation delay if theme is active
+            if (document.body.classList.contains('wc-theme')) {
+                div.style.animationDelay = `${(index % 10) * 0.1}s`;
+            }
+
             div.innerHTML = `
                 <div class="click-indicator"></div>
                 ${isNew ? '<div class="new-badge">NUEVO ⭐</div>' : ''}

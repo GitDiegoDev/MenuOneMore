@@ -1,0 +1,293 @@
+/* World Cup 2026 Theme - Argentina Edition */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@400;600;700&display=swap');
+
+:root {
+    --wc-celeste: #74C9FF;
+    --wc-blanco: #FFFFFF;
+    --wc-azul-oscuro: #0B2D5C;
+    --wc-dorado: #D4AF37;
+    --wc-gris-claro: #F4F7F9;
+    --wc-glass: rgba(255, 255, 255, 0.7);
+    --wc-shadow: 0 8px 32px rgba(11, 45, 92, 0.1);
+}
+
+body.wc-theme {
+    font-family: 'Inter', 'Poppins', sans-serif;
+    background-color: var(--wc-gris-claro);
+    background-image:
+        linear-gradient(rgba(244, 247, 249, 0.95), rgba(244, 247, 249, 0.95)),
+        url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 20c10-10 20-10 30 0s20 10 30 0 20-10 30 0' stroke='%2374c9ff' stroke-opacity='0.1' fill='none'/%3E%3Cpath d='M0 50c10-10 20-10 30 0s20 10 30 0 20-10 30 0' stroke='%2374c9ff' stroke-opacity='0.1' fill='none'/%3E%3Cpath d='M-10 80c10-10 20-10 30 0s20 10 30 0 20-10 30 0' stroke='%2374c9ff' stroke-opacity='0.1' fill='none'/%3E%3Ccircle cx='20' cy='30' r='2' fill='%2374c9ff' fill-opacity='0.1'/%3E%3Ccircle cx='80' cy='70' r='2' fill='%2374c9ff' fill-opacity='0.1'/%3E%3Cpath d='M50 40l5 5-5 5-5-5z' fill='%2374c9ff' fill-opacity='0.1'/%3E%3C/svg%3E");
+    transition: background 0.5s ease;
+}
+
+.wc-theme .container {
+    animation: wcFadeIn 0.8s ease-out;
+}
+
+@keyframes wcFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header Redesign */
+.wc-theme .header {
+    background: var(--wc-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 0 0 30px 30px;
+    box-shadow: var(--wc-shadow);
+    padding-top: 50px;
+    position: relative;
+    overflow: visible;
+}
+
+.wc-theme .header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background: linear-gradient(to right, #74C9FF 0%, #74C9FF 33%, #FFFFFF 33%, #FFFFFF 66%, #74C9FF 66%, #74C9FF 100%);
+    border-radius: 0;
+}
+
+.wc-theme .wc-stars {
+    display: flex !important;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: var(--wc-dorado);
+    font-size: 18px;
+    filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.4));
+}
+
+.wc-theme .wc-ball-icon {
+    display: block !important;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 24px;
+    opacity: 0.6;
+}
+
+/* Banner Principal */
+.wc-theme .wc-main-banner {
+    display: block !important;
+    background: linear-gradient(135deg, var(--wc-azul-oscuro) 0%, #1a4a8e 100%);
+    color: var(--wc-blanco);
+    padding: 25px;
+    border-radius: 20px;
+    margin: 20px 10px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(11, 45, 92, 0.3);
+    border: 2px solid var(--wc-celeste);
+}
+
+.wc-theme .wc-main-banner h2 {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.wc-theme .wc-main-banner p {
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+.wc-theme .wc-main-banner::before {
+    content: '🏆';
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    font-size: 80px;
+    opacity: 0.1;
+    transform: rotate(-15deg);
+}
+
+/* Categorías - Diseño Cápsula */
+.wc-theme .tabs-wrapper {
+    background: transparent;
+    padding: 15px 0;
+}
+
+.wc-theme .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background: transparent;
+    gap: 12px;
+}
+
+.wc-theme .tab {
+    background: var(--wc-blanco);
+    color: var(--wc-azul-oscuro);
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-size: 14px;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wc-theme .tab:hover {
+    background: var(--wc-celeste);
+    color: var(--wc-blanco);
+    transform: translateY(-2px);
+}
+
+.wc-theme .tab.active {
+    background: var(--wc-azul-oscuro);
+    color: var(--wc-blanco);
+    border-color: var(--wc-dorado);
+    box-shadow: 0 6px 15px rgba(11, 45, 92, 0.2);
+}
+
+/* Tarjetas de Productos */
+.wc-theme .menu-section {
+    background: transparent;
+    padding: 20px 15px;
+}
+
+.wc-theme .menu-item {
+    background: var(--wc-blanco);
+    border-radius: 20px;
+    border: none;
+    border-top: 4px solid var(--wc-celeste);
+    box-shadow: 0 6px 18px rgba(11, 45, 92, 0.08);
+    padding: 22px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.wc-theme .menu-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(11, 45, 92, 0.12);
+    border-top-color: var(--wc-azul-oscuro);
+}
+
+.wc-theme .item-name {
+    color: var(--wc-azul-oscuro);
+    font-weight: 700;
+    font-size: 19px;
+}
+
+.wc-theme .item-price {
+    background: var(--wc-celeste);
+    color: var(--wc-azul-oscuro);
+    border-radius: 12px;
+}
+
+.wc-theme .menu-item:hover .item-price {
+    background: var(--wc-azul-oscuro);
+    color: var(--wc-blanco);
+}
+
+.wc-theme .item-description {
+    color: #556b82;
+}
+
+/* Botones Modernos */
+.wc-theme .add-to-order,
+.wc-theme .whatsapp-button,
+.wc-theme .promo-button {
+    border-radius: 15px;
+    background: linear-gradient(to right, var(--wc-azul-oscuro), #1a4a8e);
+    border: none;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 14px;
+    transition: all 0.3s ease;
+}
+
+.wc-theme .add-to-order:hover,
+.wc-theme .whatsapp-button:hover,
+.wc-theme .promo-button:hover {
+    background: linear-gradient(to right, var(--wc-celeste), #5db9ff);
+    color: var(--wc-azul-oscuro);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(116, 201, 255, 0.4);
+}
+
+/* Carrito Theme */
+.wc-theme .cart-modal-container {
+    border-radius: 25px;
+}
+
+.wc-theme .cart-header {
+    background: var(--wc-celeste);
+    color: var(--wc-azul-oscuro);
+    margin: -30px -30px 20px -30px;
+    padding: 30px;
+    border-radius: 25px 25px 0 0;
+}
+
+.wc-theme .cart-header h2::before {
+    content: '⚽ ';
+}
+
+.wc-theme .cart-total {
+    border-top: 2px solid var(--wc-celeste);
+    color: var(--wc-azul-oscuro);
+}
+
+.wc-theme .cart-item {
+    border-left: 4px solid var(--wc-azul-oscuro);
+}
+
+/* Fidelity Button */
+.wc-theme .fidelity-btn {
+    background: var(--wc-azul-oscuro);
+    border: 2px solid var(--wc-dorado);
+}
+
+.wc-theme .fidelity-btn:hover {
+    background: var(--wc-celeste);
+    color: var(--wc-azul-oscuro);
+}
+
+/* Animations for progressive loading */
+.wc-theme .menu-item {
+    opacity: 0;
+    animation: wcItemFadeIn 0.5s ease forwards;
+}
+
+@keyframes wcItemFadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Small football icons in some places */
+.wc-theme .tagline::after {
+    content: ' ⚽';
+    font-style: normal;
+}
+
+.wc-theme .footer {
+    background: var(--wc-azul-oscuro);
+    border-top: 4px solid var(--wc-dorado);
+}
+
+/* Scrollbar customization */
+.wc-theme ::-webkit-scrollbar {
+    width: 8px;
+}
+
+.wc-theme ::-webkit-scrollbar-track {
+    background: var(--wc-gris-claro);
+}
+
+.wc-theme ::-webkit-scrollbar-thumb {
+    background: var(--wc-celeste);
+    border-radius: 10px;
+}
+
+.wc-theme ::-webkit-scrollbar-thumb:hover {
+    background: var(--wc-azul-oscuro);
+}
