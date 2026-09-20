@@ -1463,3 +1463,152 @@ body {
     color: #777;
     font-style: italic;
 }
+
+/* ===== RULETA DE DESCUENTOS ONE MORE ===== */
+.discount-banner {
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 13px;
+    margin-top: 10px;
+    display: inline-block;
+    box-shadow: 0 4px 10px rgba(255, 107, 53, 0.3);
+    animation: pulse 2s infinite;
+}
+
+.original-price-strike {
+    text-decoration: line-through;
+    opacity: 0.6;
+    font-size: 13px;
+    margin-right: 5px;
+    color: #aaa;
+}
+
+.discount-price {
+    color: #ff6b35;
+    font-weight: bold;
+}
+
+.roulette-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 3500;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(5px);
+}
+
+.roulette-modal.active {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+.roulette-content {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 30px 20px;
+    max-width: 380px;
+    width: 100%;
+    position: relative;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    border: 2px solid #ff6b35;
+    text-align: center;
+}
+
+.close-roulette {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 30px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-roulette:hover {
+    color: white;
+}
+
+.roulette-header h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #ff6b35;
+    margin-bottom: 8px;
+}
+
+.roulette-header p {
+    font-size: 13px;
+    color: #ccc;
+    margin-bottom: 20px;
+}
+
+.wheel-container {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wheel-pointer {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 28px;
+    color: #ff6b35;
+    z-index: 10;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+#rouletteCanvas {
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(255, 107, 53, 0.4), inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+.spin-btn {
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+    transition: all 0.3s ease;
+}
+
+.spin-btn:hover:not(:disabled) {
+    transform: scale(1.03);
+    background: linear-gradient(135deg, #ff8c5a 0%, #ff6b35 100%);
+}
+
+.spin-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.roulette-result {
+    margin-top: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    min-height: 30px;
+    color: #25D366;
+}
