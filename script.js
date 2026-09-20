@@ -25,6 +25,192 @@ let clubData = {
     is_loading: false
 };
 
+// --- Roulette State ---
+// Usamos sessionStorage para el descuento para que si el cliente no compra nada,
+// no sea válido la próxima vez que ingrese. 'roulette_spun' se mantiene en localStorage
+// para asegurar una única oportunidad de giro.
+let activeDiscountPercent = Number(sessionStorage.getItem('roulette_discount')) || 0;
+const rouletteSegments = [
+    { label: "5% OFF", discount: 5, color: "#ff6b35", textColor: "#ffffff" },
+    { label: "10% OFF", discount: 10, color: "#1a1a1a", textColor: "#ffffff" },
+    { label: "15% OFF", discount: 15, color: "#ff8c5a", textColor: "#ffffff" },
+    { label: "5% OFF", discount: 5, color: "#333333", textColor: "#ffffff" },
+    { label: "10% OFF", discount: 10, color: "#d87a00", textColor: "#ffffff" },
+    { label: "15% OFF", discount: 15, color: "#ffcc00", textColor: "#1a1a1a" }
+];
+let startAngle = 0;
+let isSpinning = false;
+
+function getDiscountedPrice(price) {
+    if (!activeDiscountPercent || activeDiscountPercent <= 0) return price;
+    return Math.round(price * (1 - activeDiscountPercent / 100));
+}
+
+function updateDiscountBannerUI() {
+    const banner = document.getElementById('discountBanner');
+    const percentEl = document.getElementById('discountPercent');
+    if (!banner || !percentEl) return;
+
+    if (activeDiscountPercent > 0) {
+        percentEl.textContent = activeDiscountPercent;
+        banner.style.display = 'inline-block';
+    } else {
+        banner.style.display = 'none';
+    }
+}
+
+function drawRouletteWheel() {
+    const canvas = document.getElementById('rouletteCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const numSegments = rouletteSegments.length;
+    const outsideRadius = 140;
+    const textRadius = 100;
+    const insideRadius = 30;
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const arc = Math.PI * 2 / numSegments;
+
+    for (let i = 0; i < numSegments; i++) {
+        const angle = startAngle + i * arc;
+        ctx.fillStyle = rouletteSegments[i].color;
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, outsideRadius, angle, angle + arc, false);
+        ctx.arc(centerX, centerY, insideRadius, angle + arc, angle, true);
+        ctx.fill();
+
+        ctx.save();
+        ctx.fillStyle = rouletteSegments[i].textColor;
+        ctx.font = "bold 16px Arial";
+        ctx.translate(
+            centerX + Math.cos(angle + arc / 2) * textRadius,
+            centerY + Math.sin(angle + arc / 2) * textRadius
+        );
+        ctx.rotate(angle + arc / 2 + Math.PI / 2);
+        const text = rouletteSegments[i].label;
+        ctx.fillText(text, -ctx.measureText(text).width / 2, 0);
+        ctx.restore();
+    }
+
+    // Dibujar centro decorativo One More
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, insideRadius, 0, Math.PI * 2, false);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#ff6b35";
+    ctx.stroke();
+
+    ctx.fillStyle = "#1a1a1a";
+    ctx.font = "bold 10px Arial";
+    ctx.fillText("ONE MORE", centerX - ctx.measureText("ONE MORE").width / 2, centerY + 3);
+}
+
+function initRouletteSystem() {
+    const rouletteModal = document.getElementById('rouletteModal');
+    const closeRouletteBtn = document.getElementById('closeRoulette');
+    const spinBtn = document.getElementById('spinBtn');
+    const resultEl = document.getElementById('rouletteResult');
+
+    if (!rouletteModal || !spinBtn) return;
+
+    drawRouletteWheel();
+    updateDiscountBannerUI();
+
+    const hasSpun = localStorage.getItem('roulette_spun');
+
+    if (hasSpun) {
+        spinBtn.disabled = true;
+        spinBtn.textContent = "Ya giraste la ruleta";
+        if (activeDiscountPercent > 0 && resultEl) {
+            resultEl.textContent = `¡Tenés un ${activeDiscountPercent}% de descuento activo!`;
+        }
+    } else {
+        // Auto mostrar modal una única vez al ingresar al menú
+        setTimeout(() => {
+            rouletteModal.classList.add('active');
+        }, 800);
+    }
+
+    if (closeRouletteBtn) {
+        closeRouletteBtn.addEventListener('click', () => {
+            rouletteModal.classList.remove('active');
+        });
+    }
+
+    spinBtn.addEventListener('click', () => {
+        if (isSpinning || localStorage.getItem('roulette_spun')) return;
+
+        isSpinning = true;
+        spinBtn.disabled = true;
+        spinBtn.textContent = "Girando...";
+        if (resultEl) resultEl.textContent = "";
+
+        // Marcar una única oportunidad jugada inmediatamente
+        localStorage.setItem('roulette_spun', 'true');
+
+        const spinAngleStart = Math.random() * 10 + 10;
+        let spinTime = 0;
+        const spinTimeTotal = Math.random() * 1000 + 3000;
+
+        function rotateWheel() {
+            spinTime += 30;
+            if (spinTime >= spinTimeTotal) {
+                stopRotateWheel();
+                return;
+            }
+            const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
+            startAngle += (spinAngle * Math.PI / 180);
+            drawRouletteWheel();
+            requestAnimationFrame(rotateWheel);
+        }
+
+        rotateWheel();
+    });
+
+    function easeOut(t, b, c, d) {
+        const ts = (t /= d) * t;
+        const tc = ts * t;
+        return b + c * (tc + -3 * ts + 3 * t);
+    }
+
+    function stopRotateWheel() {
+        isSpinning = false;
+        const numSegments = rouletteSegments.length;
+        const arc = Math.PI * 2 / numSegments;
+
+        // El puntero está en la parte superior (270 grados / -90 grados / 3PI/2)
+        const degrees = (startAngle * 180 / Math.PI) % 360;
+        const arcd = arc * 180 / Math.PI;
+        let index = Math.floor((360 - (degrees % 360) + 270) % 360 / arcd);
+        index = (index + numSegments) % numSegments;
+
+        const winningSegment = rouletteSegments[index];
+        activeDiscountPercent = winningSegment.discount;
+        sessionStorage.setItem('roulette_discount', String(activeDiscountPercent));
+
+        if (resultEl) {
+            resultEl.textContent = `🎉 ¡Ganaste ${winningSegment.label} de descuento!`;
+        }
+        spinBtn.textContent = "¡Descuento obtenido!";
+
+        updateDiscountBannerUI();
+        fetchAndRenderProducts();
+        fetchAndRenderPromos();
+
+        setTimeout(() => {
+            rouletteModal.classList.remove('active');
+        }, 2200);
+    }
+}
+
 // --- Fidelity API Functions ---
 async function fetchCustomerFidelity(phone) {
     if (!phone) return;
@@ -233,7 +419,12 @@ async function fetchAndRenderPromos() {
 
         // Render de cada promo
         promosHoy.forEach(promo => {
-            const price = promo.price ?? 0;
+            const rawPrice = promo.price ?? 0;
+            const price = getDiscountedPrice(rawPrice);
+
+            const priceDisplay = activeDiscountPercent > 0
+                ? `<span class="original-price-strike">$ ${formatPrice(rawPrice)}</span><span class="discount-price">$ ${formatPrice(price)}</span>`
+                : `$ ${formatPrice(rawPrice)}`;
 
             const promoHTML = `
                 <div class="menu-item promo-item destacado"
@@ -241,11 +432,11 @@ async function fetchAndRenderPromos() {
                     data-price="${price}">
 
                     <div class="new-badge">NUEVO ⭐</div>
-                    <div class="savings-badge">${promo.savings_badge ?? "Promo especial"}</div>
+                    <div class="savings-badge">${promo.savings_badge ?? (activeDiscountPercent > 0 ? `¡${activeDiscountPercent}% OFF!` : "Promo especial")}</div>
 
                     <div class="item-header">
                         <div class="item-name">${escapeHTML(promo.title).toUpperCase()}</div>
-                        <div class="item-price">$ ${formatPrice(price)}</div>
+                        <div class="item-price">${priceDisplay}</div>
                     </div>
 
                     <div class="item-description">${escapeHTML(promo.description)}</div>
@@ -464,7 +655,8 @@ async function fetchAndRenderProducts() {
             if (!container) return;
 
             const isNew = p.is_new || p.isNew || isProductNew(p.created_at);
-            const price = p.price ?? 0;
+            const rawPrice = p.price ?? 0;
+            const price = getDiscountedPrice(rawPrice);
             const hasVariants = p.variants && p.variants.length > 0;
             const imageHtml =
                 p.images && p.images.length
@@ -479,15 +671,21 @@ async function fetchAndRenderProducts() {
             div.dataset.item = p.name;
             div.dataset.price = price;
 
+            const priceDisplay = activeDiscountPercent > 0
+                ? `<span class="original-price-strike">$ ${formatPrice(rawPrice)}</span><span class="discount-price">$ ${formatPrice(price)}</span>`
+                : `$ ${formatPrice(rawPrice)}`;
+
+            const badgeText = activeDiscountPercent > 0 ? `¡${activeDiscountPercent}% OFF!` : '¡NUEVO!';
+
             div.innerHTML = `
                 <div class="click-indicator"></div>
                 ${isNew ? '<div class="new-badge">NUEVO ⭐</div>' : ''}
-                ${isNew ? '<div class="savings-badge">¡NUEVO!</div>' : ''}
+                ${(isNew || activeDiscountPercent > 0) ? `<div class="savings-badge">${badgeText}</div>` : ''}
                 ${imageHtml}
 
                 <div class="item-header">
                     <div class="item-name">${escapeHTML(p.name).toUpperCase()}</div>
-                    <div class="item-price">$ ${formatPrice(price)}</div>
+                    <div class="item-price">${priceDisplay}</div>
                 </div>
 
                 ${ hasVariants ? `<div class="item-description variant-only">Elegí una versión</div>` : `<div class="item-description">${escapeHTML(p.description || '')}</div>` }
@@ -735,7 +933,7 @@ function openHalfHalfModal() {
         if (name !== "Pizza Mitad & Mitad" && price > 0) {
             const option1 = document.createElement('option');
             option1.value = name;
-            option1.textContent = `${name} - $${price}`;
+            option1.textContent = `${name} - $${formatPrice(price)}`;
             option1.dataset.price = price;
 
             const option2 = option1.cloneNode(true);
@@ -771,7 +969,7 @@ function updateHalfHalfPrice() {
 
     if (p1 > 0 && p2 > 0) {
         const total = Math.max(p1, p2);
-        totalElem.textContent = `Total: $${total}`;
+        totalElem.textContent = `Total: $${formatPrice(total)}`;
         descriptionElem.textContent = `Mitad ${firstHalfSelect.value} + Mitad ${secondHalfSelect.value}`;
     } else {
         totalElem.textContent = 'Total: $0';
@@ -1153,6 +1351,9 @@ messageLines.push(`🚚 *Entrega:* ${deliveryType.value === 'domicilio' ? 'Enví
 if (deliveryType.value === "domicilio") {
     messageLines.push(`📍 *Dirección:* ${address}`);
 }
+if (activeDiscountPercent > 0) {
+    messageLines.push(`🎟️ *Descuento Ruleta:* ${activeDiscountPercent}% OFF aplicado`);
+}
 messageLines.push("--------------------------------");
 messageLines.push("*Detalle del pedido:*");
 
@@ -1188,6 +1389,15 @@ window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${finalMessage}`;
 cart = [];
 updateCart();
 cartModal.classList.remove('active');
+
+// Consumir el descuento de la ruleta después de completar la compra
+if (activeDiscountPercent > 0) {
+    activeDiscountPercent = 0;
+    sessionStorage.removeItem('roulette_discount');
+    updateDiscountBannerUI();
+    fetchAndRenderProducts();
+    fetchAndRenderPromos();
+}
 
     } catch (error) {
         console.error(error);
@@ -1249,6 +1459,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     reassignEventListeners();
+
+    // Inicializar ruleta de descuentos One More
+    initRouletteSystem();
 
     // 1️⃣ Esperar categorías
     await loadMenuCategories();

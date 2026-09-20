@@ -31,6 +31,9 @@
             <button class="fidelity-btn" id="openFidelity">
                 🎁 Club One More
             </button>
+            <div id="discountBanner" class="discount-banner" style="display: none;">
+                🎰 Descuento activo: <span id="discountPercent">0</span>% en todo el menú
+            </div>
         </div>
 
 
@@ -85,6 +88,23 @@
 
     <!-- Modal del carrito -->
     <!-- Modal de Fidelidad -->
+    <!-- Modal Ruleta de Descuentos -->
+    <div class="roulette-modal" id="rouletteModal">
+        <div class="roulette-content">
+            <button class="close-roulette" id="closeRoulette">×</button>
+            <div class="roulette-header">
+                <h2>🎰 Ruleta One More 🎰</h2>
+                <p>¡Girá y obtené un descuento exclusivo en tu pedido de hoy!</p>
+            </div>
+            <div class="wheel-container">
+                <div class="wheel-pointer">▼</div>
+                <canvas id="rouletteCanvas" width="300" height="300"></canvas>
+            </div>
+            <button class="spin-btn" id="spinBtn">🎯 ¡GIRAR RULETA!</button>
+            <div class="roulette-result" id="rouletteResult"></div>
+        </div>
+    </div>
+
     <div class="fidelity-modal" id="fidelityModal">
         <div class="fidelity-content">
             <button class="close-fidelity" id="closeFidelity">×</button>
