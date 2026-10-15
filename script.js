@@ -14,6 +14,19 @@ let initialLoadDone = false;
 const API_BASE = "https://backend-menu-production.up.railway.app/api";
 const WHATSAPP_NUMBER = "5493755415870";
 
+// ========= CONFIG RULETA DE DESCUENTOS ==========
+const RULETA_CONFIG = {
+    activa: true,
+    aplicaA: "hamburguesas", // Categoría a la que aplica el descuento ('hamburguesas', 'pizzas', etc.)
+    aplicaATexto: "hamburguesas", // Nombre para mostrar en mensajes y badges
+    gajos: [
+        { label: "5% OFF", discount: 5, weight: 40, color: "#ff6b35" },
+        { label: "10% OFF", discount: 10, weight: 30, color: "#f7c548" },
+        { label: "15% OFF", discount: 15, weight: 20, color: "#25D366" },
+        { label: "20% OFF", discount: 20, weight: 10, color: "#2b90d9" }
+    ]
+};
+
 // --- Club One More State ---
 let clubData = {
     nombre: '',
@@ -667,9 +680,23 @@ function updateCart() {
         return;
     }
 
+    const activePrize = obtenerPremioGuardado();
+
     cart.forEach((item, index) => {
-        const itemTotal = item.price * item.quantity;
-        total += itemTotal;
+        const originalItemTotal = item.price * item.quantity;
+        let finalItemTotal = originalItemTotal;
+        let hasDiscount = false;
+
+        if (activePrize && esProductoConDescuento(item)) {
+            hasDiscount = true;
+            finalItemTotal = Math.round(originalItemTotal * (1 - activePrize.discount / 100));
+        }
+
+        total += finalItemTotal;
+
+        const priceDisplayHtml = hasDiscount
+            ? `<span class="cart-original-price">$${formatPrice(originalItemTotal)}</span>$${formatPrice(finalItemTotal)} <span class="cart-discount-badge">-${activePrize.discount}%</span>`
+            : `$${formatPrice(finalItemTotal)}`;
 
         const div = document.createElement('div');
         div.classList.add('cart-item');
@@ -677,7 +704,7 @@ function updateCart() {
             <div class="cart-item-info">
                 <div class="cart-item-name">${escapeHTML(item.name)}</div>
                 ${item.variant ? `<div class="cart-item-variant">${escapeHTML(item.variant)}</div>` : ''}
-                <div class="cart-item-price">$${formatPrice(itemTotal)}</div>
+                <div class="cart-item-price">${priceDisplayHtml}</div>
             </div>
             <div class="cart-item-controls">
                 <button class="qty-btn" onclick="changeQuantity(${index}, -1)">-</button>
@@ -858,6 +885,9 @@ function reassignEventListeners() {
         const parent = this.closest('.menu-item');
         if (!parent) return; // si no hay contenedor, salimos
 
+        const section = parent.closest('.menu-section');
+        const category = section ? (section.dataset.category || section.id || '') : '';
+
         const productId = parent.dataset.id || null;
         const name = parent.dataset.item;
         const price = parseInt(parent.dataset.price) || 0;
@@ -898,7 +928,8 @@ function reassignEventListeners() {
                     name,
                     price,
                     quantity: 1,
-                    variant
+                    variant,
+                    category
                 });
             }
             updateCart();
@@ -1156,23 +1187,43 @@ if (deliveryType.value === "domicilio") {
 messageLines.push("--------------------------------");
 messageLines.push("*Detalle del pedido:*");
 
+const activePrize = obtenerPremioGuardado();
+let calculatedTotal = 0;
+
 cart.forEach(item => {
     let cleanName = item.name
         .replace(/&/g, 'y')
         .replace(/%/g, 'por ciento')
         .replace(/#/g, 'num');
 
+    const originalItemTotal = item.price * item.quantity;
+    let finalItemTotal = originalItemTotal;
+
+    if (activePrize && esProductoConDescuento(item)) {
+        finalItemTotal = Math.round(originalItemTotal * (1 - activePrize.discount / 100));
+    }
+    calculatedTotal += finalItemTotal;
+
     let itemText = `*${item.quantity}x* ${cleanName}`;
     if (item.variant) {
         itemText += ` _(${item.variant})_`;
     }
-    itemText += ` - $${formatPrice(item.price * item.quantity)}`;
+    if (finalItemTotal < originalItemTotal) {
+        itemText += ` - ~$${formatPrice(originalItemTotal)}~ *$${formatPrice(finalItemTotal)}*`;
+    } else {
+        itemText += ` - $${formatPrice(finalItemTotal)}`;
+    }
 
     messageLines.push(`• ${itemText}`);
 });
 
+if (activePrize) {
+    messageLines.push("--------------------------------");
+    messageLines.push(`🎰 *Ruleta:* ${activePrize.discount}% OFF`);
+}
+
 messageLines.push("--------------------------------");
-messageLines.push(`💰 *TOTAL: $${formatPrice(total)}*`);
+messageLines.push(`💰 *TOTAL: $${formatPrice(calculatedTotal)}*`);
 messageLines.push("--------------------------------");
 messageLines.push("¡Gracias por elegirnos! 😉");
 
@@ -1230,6 +1281,265 @@ function showMenuSkeleton() {
     });
 }
 
+// =====================================================================
+// ==================== LÓGICA RULETA DE DESCUENTOS ====================
+// =====================================================================
+
+// Helper para obtener la fecha de hoy en formato YYYY-MM-DD
+function getTodayString() {
+    const today = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    return `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+}
+
+// 1. Sortear premio basado en las probabilidades (weight) de RULETA_CONFIG
+function sortearPremio() {
+    if (!RULETA_CONFIG || !RULETA_CONFIG.gajos || RULETA_CONFIG.gajos.length === 0) return null;
+
+    const totalWeight = RULETA_CONFIG.gajos.reduce((acc, g) => acc + (g.weight || 0), 0);
+    let randomNum = Math.random() * totalWeight;
+
+    for (let i = 0; i < RULETA_CONFIG.gajos.length; i++) {
+        const gajo = RULETA_CONFIG.gajos[i];
+        if (randomNum < gajo.weight) {
+            return { index: i, ...gajo };
+        }
+        randomNum -= gajo.weight;
+    }
+
+    return { index: 0, ...RULETA_CONFIG.gajos[0] };
+}
+
+// 2. Guardar el resultado en localStorage con la fecha de hoy
+function guardarPremio(premio) {
+    try {
+        const payload = {
+            date: getTodayString(),
+            discount: premio.discount,
+            label: premio.label,
+            aplicaA: RULETA_CONFIG.aplicaA,
+            aplicaATexto: RULETA_CONFIG.aplicaATexto
+        };
+        localStorage.setItem('roulette_prize', JSON.stringify(payload));
+    } catch (e) {
+        console.warn('No se pudo guardar la ruleta en localStorage:', e);
+    }
+}
+
+// 3. Obtener el premio guardado si es vigente hoy
+function obtenerPremioGuardado() {
+    if (!RULETA_CONFIG || !RULETA_CONFIG.activa) return null;
+    try {
+        const raw = localStorage.getItem('roulette_prize');
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        if (data && data.date === getTodayString()) {
+            return data;
+        }
+    } catch (e) {
+        console.warn('Error leyendo premio de ruleta de localStorage:', e);
+    }
+    return null;
+}
+
+// Helper para verificar si un producto aplica para el descuento
+function esProductoConDescuento(item) {
+    if (!RULETA_CONFIG || !RULETA_CONFIG.activa) return false;
+    const target = (RULETA_CONFIG.aplicaA || '').toLowerCase();
+    if (!target) return false;
+
+    const itemName = (item.name || '').toLowerCase();
+    const itemCat = (item.category || '').toLowerCase();
+
+    return itemName.includes(target) || itemCat.includes(target);
+}
+
+// Renderizar la ruleta SVG con gajos dinámicos
+function renderRouletteSvg() {
+    const svg = document.getElementById('rouletteSvg');
+    if (!svg || !RULETA_CONFIG || !RULETA_CONFIG.gajos) return;
+
+    const gajos = RULETA_CONFIG.gajos;
+    const count = gajos.length;
+    const anglePerGajo = 360 / count;
+    const radius = 150;
+    const centerX = 150;
+    const centerY = 150;
+
+    let pathsHtml = '';
+
+    gajos.forEach((gajo, i) => {
+        const startAngle = i * anglePerGajo;
+        const endAngle = (i + 1) * anglePerGajo;
+
+        const startRad = (startAngle - 90) * Math.PI / 180;
+        const endRad = (endAngle - 90) * Math.PI / 180;
+
+        const x1 = centerX + radius * Math.cos(startRad);
+        const y1 = centerY + radius * Math.sin(startRad);
+        const x2 = centerX + radius * Math.cos(endRad);
+        const y2 = centerY + radius * Math.sin(endRad);
+
+        const largeArcFlag = anglePerGajo > 180 ? 1 : 0;
+
+        const pathData = `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
+
+        // Posición del texto (centro del gajo)
+        const midAngle = startAngle + anglePerGajo / 2;
+        const midRad = (midAngle - 90) * Math.PI / 180;
+        const textRadius = radius * 0.65;
+        const textX = centerX + textRadius * Math.cos(midRad);
+        const textY = centerY + textRadius * Math.sin(midRad);
+
+        pathsHtml += `
+            <g>
+                <path d="${pathData}" fill="${gajo.color}" stroke="#ffffff" stroke-width="2"/>
+                <text x="${textX}" y="${textY}" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle" dominant-baseline="central" transform="rotate(${midAngle}, ${textX}, ${textY})">
+                    ${escapeHTML(gajo.label)}
+                </text>
+            </g>
+        `;
+    });
+
+    // Círculo central decorativo
+    pathsHtml += `<circle cx="${centerX}" cy="${centerY}" r="22" fill="#1a1a1a" stroke="#ffffff" stroke-width="3"/>`;
+    pathsHtml += `<text x="${centerX}" y="${centerY}" fill="#ff6b35" font-size="16" text-anchor="middle" dominant-baseline="central">🎰</text>`;
+
+    svg.innerHTML = pathsHtml;
+}
+
+// 4. Animar ruleta para frenar exactamente en el gajo sorteado
+let isSpinning = false;
+function animarRuleta(premioSorteado, callback) {
+    const wrapper = document.getElementById('wheelWrapper');
+    if (!wrapper || isSpinning) return;
+
+    isSpinning = true;
+    const spinBtn = document.getElementById('spinRouletteBtn');
+    if (spinBtn) spinBtn.disabled = true;
+
+    const gajos = RULETA_CONFIG.gajos;
+    const count = gajos.length;
+    const anglePerGajo = 360 / count;
+
+    // Calcular el ángulo objetivo para que el gajo sorteado quede arriba (apuntado por el puntero)
+    // El puntero está en la parte superior (0 grados / -90 rad).
+    // Cada gajo 'i' va desde i*anglePerGajo hasta (i+1)*anglePerGajo.
+    // El centro del gajo 'i' es (i + 0.5) * anglePerGajo.
+    const targetGajoCenter = (premioSorteado.index + 0.5) * anglePerGajo;
+
+    // Para colocar ese centro arriba en 0deg, la ruleta debe rotar: 360 - targetGajoCenter
+    const baseRotation = 360 - targetGajoCenter;
+
+    // Añadir de 4 a 6 vueltas completas (360 * 5 = 1800 deg) para animación emocionante
+    const fullSpins = 360 * 5;
+    const finalDegree = fullSpins + baseRotation;
+
+    wrapper.style.transform = `rotate(${finalDegree}deg)`;
+
+    // Tras 3.5 segundos (duración coincidente con la transición CSS), finalizar
+    setTimeout(() => {
+        isSpinning = false;
+        if (callback) callback();
+    }, 3500);
+}
+
+// 5. Efecto de confeti visual ligero
+function confettiEffect() {
+    const modalContent = document.querySelector('.roulette-content');
+    if (!modalContent) return;
+
+    const colors = ['#ff6b35', '#f7c548', '#25D366', '#2b90d9', '#ffffff'];
+    for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'confetti-particle';
+        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.left = '50%';
+        particle.style.top = '40%';
+
+        const dx = (Math.random() - 0.5) * 260 + 'px';
+        const dy = (Math.random() - 0.5) * 260 + 'px';
+        particle.style.setProperty('--dx', dx);
+        particle.style.setProperty('--dy', dy);
+
+        modalContent.appendChild(particle);
+        setTimeout(() => particle.remove(), 2500);
+    }
+}
+
+// 6. Actualizar el badge discreto en la cabecera
+function actualizarBadgeRuleta() {
+    const badge = document.getElementById('rouletteBadge');
+    if (!badge) return;
+
+    const premio = obtenerPremioGuardado();
+    if (premio) {
+        badge.textContent = `🎁 Ruleta: ${premio.discount}% OFF en ${premio.aplicaATexto} hoy`;
+        badge.style.display = 'inline-block';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+// 7. Mostrar u ocultar modal de ruleta
+function initRuleta() {
+    if (!RULETA_CONFIG || !RULETA_CONFIG.activa) return;
+
+    renderRouletteSvg();
+    actualizarBadgeRuleta();
+
+    const modal = document.getElementById('rouletteModal');
+    const closeBtn = document.getElementById('closeRoulette');
+    const spinBtn = document.getElementById('spinRouletteBtn');
+    const closeResultBtn = document.getElementById('closeRouletteResultBtn');
+    const spinView = document.getElementById('rouletteSpinView');
+    const resultView = document.getElementById('rouletteResultView');
+    const prizeText = document.getElementById('roulettePrizeText');
+
+    if (!modal) return;
+
+    const premioExistente = obtenerPremioGuardado();
+
+    // Si la ruleta está activa y el cliente ENTRA por primera vez en el día:
+    if (!premioExistente) {
+        modal.classList.add('active');
+        if (spinView) spinView.style.display = 'block';
+        if (resultView) resultView.style.display = 'none';
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+    }
+
+    if (spinBtn) {
+        spinBtn.addEventListener('click', () => {
+            if (isSpinning) return;
+            const premio = sortearPremio();
+            guardarPremio(premio);
+
+            animarRuleta(premio, () => {
+                confettiEffect();
+                if (prizeText) {
+                    prizeText.textContent = `¡Ganaste ${premio.discount}% OFF en ${RULETA_CONFIG.aplicaATexto} hoy!`;
+                }
+                if (spinView) spinView.style.display = 'none';
+                if (resultView) resultView.style.display = 'block';
+
+                actualizarBadgeRuleta();
+                updateCart();
+            });
+        });
+    }
+
+    if (closeResultBtn) {
+        closeResultBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+    }
+}
+
 // ========= INICIALIZACIÓN AL CARGAR LA PÁGINA =========
 
 document.addEventListener('DOMContentLoaded', async function () {
@@ -1265,6 +1575,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     } catch (e) {
         console.error('Error en carga inicial del menú', e);
     }
+
+    // Inicializar ruleta de descuentos
+    initRuleta();
 
     // 4️⃣ Refresco automático SEGURO (no rompe el menú)
     setInterval(async () => {
