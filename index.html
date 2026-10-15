@@ -31,6 +31,9 @@
             <button class="fidelity-btn" id="openFidelity">
                 🎁 Club One More
             </button>
+
+            <!-- Badge de descuento de la ruleta si está activo -->
+            <div id="rouletteBadge" class="roulette-badge" style="display: none;"></div>
         </div>
 
 
@@ -184,6 +187,40 @@
         </div>
     </div>
 </div>
+</div>
+
+<!-- Modal de Ruleta de Descuentos -->
+<div class="roulette-modal" id="rouletteModal">
+    <div class="roulette-content">
+        <button class="close-roulette" id="closeRoulette">×</button>
+
+        <div id="rouletteSpinView">
+            <h2 class="roulette-title">🎰 Ruleta de Descuentos</h2>
+            <p class="roulette-subtitle">¡Girá y obtené tu descuento exclusivo para hoy!</p>
+
+            <div class="wheel-container">
+                <div class="wheel-pointer">▼</div>
+                <div class="wheel-wrapper" id="wheelWrapper">
+                    <svg id="rouletteSvg" viewBox="0 0 300 300"></svg>
+                </div>
+            </div>
+
+            <button class="roulette-spin-btn" id="spinRouletteBtn">
+                🎡 ¡GIRAR RULETA!
+            </button>
+        </div>
+
+        <div id="rouletteResultView" style="display: none;">
+            <div class="roulette-prize-icon">🎉</div>
+            <h2 class="roulette-title">¡FELICITACIONES!</h2>
+            <div class="roulette-prize-text" id="roulettePrizeText"></div>
+            <p class="roulette-prize-sub">El descuento se aplicará automáticamente en tu carrito durante el día de hoy.</p>
+
+            <button class="add-to-order" id="closeRouletteResultBtn" style="margin-top: 20px;">
+                🍔 Seguir al menú
+            </button>
+        </div>
+    </div>
 </div>
 
 <div id="wa-loading">
